@@ -1,0 +1,11 @@
+{
+  "values": [
+    "tfc:fire_bricks",
+    "tfc:reinforced_fire_bricks",
+    "minecraft:bricks",
+    "minecraft:brick_stairs",
+    "minecraft:brick_slab",
+    "minecraft:tinted_glass",
+    "tfc:fireproof_door"
+  ]
+}

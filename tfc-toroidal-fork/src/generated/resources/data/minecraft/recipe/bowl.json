@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": {
+      "item": "tfc:glue"
+    },
+    "L": {
+      "tag": "tfc:lumber"
+    }
+  },
+  "pattern": [
+    "LGL",
+    " L "
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:bowl"
+  }
+}

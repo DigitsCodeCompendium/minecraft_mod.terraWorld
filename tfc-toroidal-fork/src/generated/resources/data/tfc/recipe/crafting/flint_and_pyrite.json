@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "F": {
+      "item": "minecraft:flint"
+    },
+    "P": {
+      "item": "tfc:ore/pyrite"
+    }
+  },
+  "pattern": [
+    " F",
+    "P "
+  ],
+  "result": {
+    "count": 1,
+    "id": "tfc:flint_and_pyrite"
+  }
+}

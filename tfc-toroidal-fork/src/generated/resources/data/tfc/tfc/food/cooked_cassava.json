@@ -1,0 +1,10 @@
+{
+  "decay_modifier": 2.5,
+  "grain": 0.6,
+  "hunger": 4,
+  "ingredient": {
+    "item": "tfc:food/cooked_cassava"
+  },
+  "saturation": 2.0,
+  "vegetables": 1.0
+}

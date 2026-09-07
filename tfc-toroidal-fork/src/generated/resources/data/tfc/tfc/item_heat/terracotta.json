@@ -1,0 +1,14 @@
+{
+  "heat_capacity": 0.5,
+  "ingredient": [
+    {
+      "item": "minecraft:terracotta"
+    },
+    {
+      "item": "minecraft:white_terracotta"
+    },
+    {
+      "tag": "tfc:colored_terracotta"
+    }
+  ]
+}

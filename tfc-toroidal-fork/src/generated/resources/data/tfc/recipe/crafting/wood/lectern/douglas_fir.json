@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "tfc:wood/bookshelf/douglas_fir"
+    },
+    "L": {
+      "item": "tfc:wood/lumber/douglas_fir"
+    }
+  },
+  "pattern": [
+    "LLL",
+    " B ",
+    " L "
+  ],
+  "result": {
+    "count": 1,
+    "id": "tfc:wood/lectern/douglas_fir"
+  }
+}

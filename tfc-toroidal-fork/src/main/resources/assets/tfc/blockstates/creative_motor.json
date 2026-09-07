@@ -1,0 +1,18 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "variants": {
+    "axis=x": {
+      "model": "tfc:block/creative_motor",
+      "y": 270
+    },
+    "axis=z": {
+      "model": "tfc:block/creative_motor",
+      "y": 180
+    },
+    "axis=y": {
+      "model": "tfc:block/creative_motor",
+      "y": 180,
+      "x": 90
+    }
+  }
+}

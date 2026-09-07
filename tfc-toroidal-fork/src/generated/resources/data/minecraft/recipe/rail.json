@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "R": {
+      "tag": "c:rods/wrought_iron"
+    },
+    "S": {
+      "tag": "c:rods/wooden"
+    }
+  },
+  "pattern": [
+    "R R",
+    "RSR",
+    "R R"
+  ],
+  "result": {
+    "count": 32,
+    "id": "minecraft:rail"
+  }
+}

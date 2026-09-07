@@ -1,0 +1,12 @@
+{
+  "type": "tfc:landslide",
+  "ingredient": [
+    "tfc:dirt/oxisol",
+    "tfc:grass/oxisol",
+    "tfc:duff/oxisol",
+    "tfc:grass_path/oxisol",
+    "tfc:farmland/oxisol",
+    "tfc:rooted_dirt/oxisol"
+  ],
+  "result": "tfc:dirt/oxisol"
+}

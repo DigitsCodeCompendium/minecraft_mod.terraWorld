@@ -1,0 +1,122 @@
+/*
+ * Licensed under the EUPL, Version 1.2.
+ * You may obtain a copy of the Licence at:
+ * https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+ */
+
+package net.dries007.tfc.common.blocks;
+
+import java.util.ArrayList;
+import java.util.List;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
+
+import net.dries007.tfc.common.items.TFCItems;
+import net.dries007.tfc.util.Helpers;
+
+public class AbstractRopeBlock extends HorizontalDirectionalBlock implements IForgeBlockExtension
+{
+    public static void recallRope(LevelAccessor level, BlockPos pos, BlockState state, Player player, Direction dir)
+    {
+        final List<BlockPos> positions = new ArrayList<>(32);
+        if (!isRope(state))
+            return;
+        while (true)
+        {
+            if (state.getBlock() instanceof HangingRopeBlock)
+            {
+                pos = pos.below();
+                state = level.getBlockState(pos);
+                if (continuesLine(state, dir))
+                {
+                    positions.add(pos);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else
+            {
+                pos = pos.relative(dir);
+                state = level.getBlockState(pos);
+                if (!continuesLine(state, dir))
+                {
+                    pos = pos.below();
+                    state = level.getBlockState(pos);
+                    if (continuesLine(state, dir))
+                    {
+                        positions.add(pos);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    positions.add(pos);
+                }
+            }
+        }
+        positions.reversed().forEach(ropePos -> {
+            level.destroyBlock(ropePos, false);
+            if (!player.isCreative())
+                ItemHandlerHelper.giveItemToPlayer(player, TFCItems.ROPE.get().getDefaultInstance());
+        });
+    }
+
+    private static boolean isRope(BlockState state)
+    {
+        return state.getBlock() instanceof AbstractRopeBlock;
+    }
+
+    private static boolean continuesLine(BlockState state, Direction dir)
+    {
+        return isRope(state) && state.getValue(FACING) == dir.getOpposite();
+    }
+
+    public static final VoxelShape SHAPE_X = box(7, 0, 0, 9, 2, 16);
+    public static final VoxelShape SHAPE_Z = Helpers.rotateShape(Direction.EAST, 7, 0, 0, 9, 2, 16);
+
+    private final ExtendedProperties properties;
+
+    public AbstractRopeBlock(ExtendedProperties properties)
+    {
+        super(properties.properties());
+        this.properties = properties;
+    }
+
+    protected boolean isBlockBelowSturdy(LevelReader level, BlockPos pos)
+    {
+        return !level.getBlockState(pos.below()).canBeReplaced();
+    }
+
+    @Override
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
+    {
+        super.createBlockStateDefinition(builder.add(FACING));
+    }
+
+    @Override
+    protected MapCodec<HorizontalDirectionalBlock> codec()
+    {
+        return fakeBlockCodec();
+    }
+
+    @Override
+    public ExtendedProperties getExtendedProperties()
+    {
+        return properties;
+    }
+}

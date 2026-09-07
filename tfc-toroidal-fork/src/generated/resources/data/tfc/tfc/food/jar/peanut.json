@@ -1,0 +1,8 @@
+{
+  "decay_modifier": 0.1,
+  "edible": false,
+  "hunger": 4,
+  "ingredient": {
+    "item": "tfc:jar/peanut"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "values": [
+    "#c:stones",
+    "#c:stones/smooth",
+    "#c:cobblestones",
+    "#c:gravels",
+    "#c:sands",
+    "#c:sandstone/blocks"
+  ]
+}

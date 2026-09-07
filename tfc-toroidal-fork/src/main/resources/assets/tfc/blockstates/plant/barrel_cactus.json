@@ -1,0 +1,34 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "part": "lower"
+      },
+      "apply": [
+        {
+          "model": "tfc:block/plant/barrel_cactus_lower"
+        }
+      ]
+    },
+    {
+      "when": {
+        "part": "upper"
+      },
+      "apply": [
+        {
+          "model": "tfc:block/plant/barrel_cactus_flower_dynamic"
+        }
+      ]
+    },
+    {
+      "when": {
+        "part": "upper"
+      },
+      "apply": [
+		{
+          "model": "tfc:block/plant/barrel_cactus_upper"
+        }
+      ]
+    }
+  ]
+}

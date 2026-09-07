@@ -1,0 +1,8 @@
+{
+  "decay_modifier": 2.0,
+  "edible": false,
+  "hunger": 4,
+  "ingredient": {
+    "item": "minecraft:egg"
+  }
+}

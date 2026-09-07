@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": {
+      "tag": "c:rods/steel"
+    },
+    "S": {
+      "tag": "c:rods/wooden"
+    },
+    "T": {
+      "item": "minecraft:redstone_torch"
+    }
+  },
+  "pattern": [
+    "ISI",
+    "ITI",
+    "ISI"
+  ],
+  "result": {
+    "count": 12,
+    "id": "minecraft:activator_rail"
+  }
+}

@@ -1,0 +1,374 @@
+/*
+ * Licensed under the EUPL, Version 1.2.
+ * You may obtain a copy of the Licence at:
+ * https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+ */
+
+package net.dries007.tfc.common.blocks.wood;
+
+import java.util.function.Supplier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.ParticleUtils;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
+
+import net.dries007.tfc.client.ClimateRenderCache;
+import net.dries007.tfc.client.overworld.SolarCalculator;
+import net.dries007.tfc.client.particle.TFCParticles;
+import net.dries007.tfc.common.TFCTags;
+import net.dries007.tfc.common.blocks.ExtendedProperties;
+import net.dries007.tfc.common.blocks.IForgeBlockExtension;
+import net.dries007.tfc.common.blocks.ISlowEntities;
+import net.dries007.tfc.common.blocks.TFCBlockStateProperties;
+import net.dries007.tfc.common.fluids.FluidHelpers;
+import net.dries007.tfc.common.fluids.FluidProperty;
+import net.dries007.tfc.common.fluids.IFluidLoggable;
+import net.dries007.tfc.config.TFCConfig;
+import net.dries007.tfc.util.Helpers;
+import net.dries007.tfc.util.calendar.Calendars;
+import net.dries007.tfc.util.calendar.Season;
+import net.dries007.tfc.util.registry.RegistryWood;
+
+public class TFCLeavesBlock extends Block implements ILeavesBlock, IForgeBlockExtension, IFluidLoggable, ISlowEntities
+{
+    public static final BooleanProperty PERSISTENT = BlockStateProperties.PERSISTENT;
+    public static final FluidProperty FLUID = TFCBlockStateProperties.WATER;
+    public static final IntegerProperty DISTANCE = TFCBlockStateProperties.DISTANCE_10;
+
+    // This is the maximum (normal) value of the distance that we support. Setting to 10 will cause it to decay on random tick,
+    // as in vanilla, and that behavior can be enabled in the config.
+    public static final int MAX_DECAY_DISTANCE = 9;
+
+
+    public static void doParticles(ServerLevel level, double x, double y, double z, int count)
+    {
+        level.sendParticles(TFCParticles.LEAF.get(), x, y, z, count, 0, 0, 0, 0.3f);
+    }
+
+    public static void onEntityInside(Level level, Entity entity)
+    {
+        if (Helpers.isEntity(entity, TFCTags.Entities.DESTROYED_BY_LEAVES))
+        {
+            entity.kill();
+        }
+        if (level.random.nextInt(20) == 0 && level instanceof ServerLevel server && Helpers.hasMoved(entity))
+        {
+            doParticles(server, entity.getX(), entity.getEyeY() - 0.25D, entity.getZ(), 3);
+        }
+    }
+
+    public static void dripRainwater(Level level, BlockPos pos, RandomSource random)
+    {
+        if (level.isRainingAt(pos.above()))
+        {
+            if (random.nextInt(15) == 1)
+            {
+                final BlockPos belowPos = pos.below();
+                final BlockState belowState = level.getBlockState(belowPos);
+                if (!belowState.canOcclude() || !belowState.isFaceSturdy(level, belowPos, Direction.UP))
+                {
+                    ParticleUtils.spawnParticleBelow(level, pos, random, ParticleTypes.DRIPPING_WATER);
+                }
+            }
+        }
+    }
+
+    private final ExtendedProperties properties;
+    private final RegistryWood wood;
+    @Nullable private final Supplier<? extends Block> fallenLeaves;
+    @Nullable private final Supplier<? extends Block> fallenTwig;
+
+    public TFCLeavesBlock(ExtendedProperties properties, RegistryWood wood, @Nullable Supplier<? extends Block> fallenLeaves, @Nullable Supplier<? extends Block> fallenTwig)
+    {
+        super(properties.properties());
+
+        this.properties = properties;
+        this.fallenLeaves = fallenLeaves;
+        this.fallenTwig = fallenTwig;
+        this.wood = wood;
+
+        // Distance is dependent on tree species
+        registerDefaultState(stateDefinition.any().setValue(DISTANCE, 1).setValue(PERSISTENT, false));
+    }
+
+    @Override
+    public ExtendedProperties getExtendedProperties()
+    {
+        return properties;
+    }
+
+    /**
+     * Update the provided state given the provided neighbor facing and neighbor state, returning a new state.
+     * For example, fences make their connections to the passed in state if possible, and wet concrete powder immediately
+     * returns its solidified counterpart.
+     * Note that this method should ideally consider only the specific face passed in.
+     */
+    @Override
+    protected BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos)
+    {
+        FluidHelpers.tickFluid(level, currentPos, state);
+        final int distance = getDistance(facingState) + 1;
+        if (distance != 1 || state.getValue(DISTANCE) != distance)
+        {
+            level.scheduleTick(currentPos, this, 1);
+        }
+        return state;
+    }
+
+    @Override
+    protected int getLightBlock(BlockState state, BlockGetter level, BlockPos pos)
+    {
+        return 1;
+    }
+
+    @Override
+    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context)
+    {
+        return Shapes.empty();
+    }
+
+    @Override
+    protected float getShadeBrightness(BlockState state, BlockGetter level, BlockPos pos)
+    {
+        return 0.2F;
+    }
+
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random)
+    {
+        if (!state.getValue(PERSISTENT) && random.nextInt(30) == 0)
+        {
+            if (Calendars.CLIENT.getHemispheralCalendarMonthOfYear(SolarCalculator.getInNorthernHemisphere(pos, level)).getSeason() == Season.FALL || ClimateRenderCache.INSTANCE.getWind().lengthSquared() > 0.42f * 0.42f)
+            {
+                final BlockState belowState = level.getBlockState(pos.below());
+                if (belowState.isAir())
+                {
+                    final BlockState aboveState = level.getBlockState(pos.above());
+                    ParticleOptions particle;
+                    if (Helpers.isBlock(aboveState, BlockTags.SNOW) && random.nextBoolean())
+                    {
+                        particle = TFCParticles.SNOWFLAKE.get();
+                    }
+                    else
+                    {
+                        particle = new BlockParticleOption(TFCParticles.FALLING_LEAF.get(), state);
+                    }
+                    ParticleUtils.spawnParticleBelow(level, pos, random, particle);
+
+                }
+            }
+        }
+        dripRainwater(level, pos, random);
+    }
+
+    @Override
+    protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource rand)
+    {
+        super.randomTick(state, level, pos, rand); // super calls tick()
+        if (state.getValue(DISTANCE) > MAX_DECAY_DISTANCE && !state.getValue(PERSISTENT))
+        {
+            level.removeBlock(pos, false);
+            if (rand.nextFloat() < 0.01f) createDestructionEffects(state, level, pos, rand, false);
+            doParticles(level, pos.getX() + rand.nextFloat(), pos.getY() + rand.nextFloat(), pos.getZ() + rand.nextFloat(), 1);
+        }
+        else if (rand.nextFloat() < 0.0005f && Calendars.SERVER.getHemispheralCalendarMonthOfYear(SolarCalculator.getInNorthernHemisphere(pos, level)).getSeason() == Season.FALL && !state.getValue(PERSISTENT))
+        {
+            createDestructionEffects(state, level, pos, rand, true);
+        }
+    }
+
+    @Override
+    protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource rand)
+    {
+        final int oldDistance = state.getValue(DISTANCE);
+        int distance = updateDistance(level, pos);
+        if (distance > MAX_DECAY_DISTANCE)
+        {
+            if (!state.getValue(PERSISTENT))
+            {
+                if (!TFCConfig.SERVER.enableLeavesDecaySlowly.get())
+                {
+                    level.removeBlock(pos, false);
+                    if (rand.nextFloat() < 0.01f) createDestructionEffects(state, level, pos, rand, false);
+                    doParticles(level, pos.getX() + rand.nextFloat(), pos.getY() + rand.nextFloat(), pos.getZ() + rand.nextFloat(), 1);
+                }
+                else
+                {
+                    // max + 1 means it must decay next random tick
+                    level.setBlockAndUpdate(pos, state.setValue(DISTANCE, MAX_DECAY_DISTANCE + 1));
+                }
+            }
+            else
+            {
+                level.setBlock(pos, state.setValue(DISTANCE, MAX_DECAY_DISTANCE), 3);
+            }
+        }
+        else if (distance != oldDistance)
+        {
+            level.setBlock(pos, state.setValue(DISTANCE, distance), 3);
+        }
+    }
+
+    public void createDestructionEffects(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, boolean replaceOnlyAir)
+    {
+        final BlockState twig = getFallenTwig();
+        final BlockState leaf = getFallenLeaves();
+        if (twig == null && leaf == null)
+        {
+            return;
+        }
+        final BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+        cursor.set(pos);
+        BlockState stateAt = Blocks.AIR.defaultBlockState();
+        int i = 0;
+        while (i < 15 && (stateAt.getBlock() instanceof ILeavesBlock || stateAt.canBeReplaced()))
+        {
+            i++;
+            cursor.move(0, -1, 0);
+
+            stateAt = level.getBlockState(cursor);
+        }
+        cursor.move(0, 1, 0);
+        stateAt = level.getBlockState(cursor);
+
+        if (stateAt.canBeReplaced())
+        {
+            BlockState placeState = twig == null ? leaf : twig;
+            if (leaf != null && twig != null && random.nextFloat() < 0.5f)
+            {
+                placeState = leaf;
+                if (stateAt.getBlock() == leaf.getBlock() && stateAt.getBlock() instanceof FallenLeavesBlock leavesBlock && stateAt.getValue(FallenLeavesBlock.LAYERS) < FallenLeavesBlock.MAX_LAYERS)
+                {
+                    final  int layers = stateAt.getValue(FallenLeavesBlock.LAYERS);
+                    final BlockState toPlace = layers + 1 == FallenLeavesBlock.MAX_LAYERS ? leavesBlock.getLeaves().get().defaultBlockState().setValue(TFCLeavesBlock.PERSISTENT, true) : state.setValue(FallenLeavesBlock.LAYERS, layers + 1);
+                    level.setBlockAndUpdate(pos, toPlace);
+                }
+            }
+            if (placeState.canSurvive(level, cursor))
+            {
+                if (replaceOnlyAir && !stateAt.isAir())
+                {
+                    return;
+                }
+                level.setBlockAndUpdate(cursor, placeState);
+            }
+        }
+    }
+
+    @Override
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity)
+    {
+        onEntityInside(level, entity);
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context)
+    {
+        final FluidState fluid = context.getLevel().getFluidState(context.getClickedPos());
+        return defaultBlockState()
+            .setValue(PERSISTENT, context.getPlayer() != null)
+            .setValue(getFluidProperty(), getFluidProperty().keyForOrEmpty(fluid.getType()));
+    }
+
+    @Override
+    public FluidProperty getFluidProperty()
+    {
+        return FLUID;
+    }
+
+    @Override
+    public FluidState getFluidState(BlockState state)
+    {
+        return IFluidLoggable.super.getFluidState(state);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
+    {
+        builder.add(PERSISTENT, DISTANCE, getFluidProperty());
+    }
+
+    @Nullable
+    public BlockState getFallenLeaves()
+    {
+        return fallenLeaves == null ? null : fallenLeaves.get().defaultBlockState();
+    }
+
+    @Nullable
+    public BlockState getFallenTwig()
+    {
+        return fallenTwig == null ? null : fallenTwig.get().defaultBlockState();
+    }
+
+    @Override
+    public float slowEntityFactor(BlockState state)
+    {
+        return state.getFluidState().isEmpty() ? TFCConfig.SERVER.leavesMovementModifier.get().floatValue() : NO_SLOW;
+    }
+
+    public int getAutumnIndex()
+    {
+        return wood.autumnIndex();
+    }
+
+    public float getFlowerOffset()
+    {
+        return wood.getFlowerOffset();
+    }
+
+    public boolean isConifer()
+    {
+        return wood.isConifer();
+    }
+
+    private int updateDistance(LevelAccessor level, BlockPos pos)
+    {
+        int distance = 1 + MAX_DECAY_DISTANCE;
+        BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+        for (Direction direction : Helpers.DIRECTIONS)
+        {
+            mutablePos.set(pos).move(direction);
+            distance = Math.min(distance, getDistance(level.getBlockState(mutablePos)) + 1);
+            if (distance == 1)
+            {
+                break;
+            }
+        }
+        return distance;
+    }
+
+    private int getDistance(BlockState neighbor)
+    {
+        if (Helpers.isBlock(neighbor.getBlock(), BlockTags.LOGS))
+        {
+            return 0;
+        }
+        else
+        {
+            // Check against this leaf block only, not any leaves
+            return neighbor.getBlock() == this ? neighbor.getValue(DISTANCE) : MAX_DECAY_DISTANCE;
+        }
+    }
+}

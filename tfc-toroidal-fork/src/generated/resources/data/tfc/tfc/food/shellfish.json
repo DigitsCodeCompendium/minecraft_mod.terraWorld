@@ -1,0 +1,8 @@
+{
+  "decay_modifier": 5.0,
+  "hunger": 4,
+  "ingredient": {
+    "item": "tfc:food/shellfish"
+  },
+  "protein": 0.5
+}

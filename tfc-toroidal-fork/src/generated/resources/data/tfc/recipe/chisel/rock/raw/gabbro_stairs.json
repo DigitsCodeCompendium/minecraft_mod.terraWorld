@@ -1,0 +1,8 @@
+{
+  "type": "tfc:chisel",
+  "ingredient": [
+    "tfc:rock/raw/gabbro"
+  ],
+  "mode": "tfc:stair",
+  "result": "tfc:rock/raw/gabbro_stairs"
+}

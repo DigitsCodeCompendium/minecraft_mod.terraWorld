@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "tfc:metal/bars/red_steel"
+    }
+  },
+  "pattern": [
+    " B ",
+    "B B",
+    " B "
+  ],
+  "result": {
+    "count": 1,
+    "id": "tfc:metal/grate/red_steel"
+  }
+}

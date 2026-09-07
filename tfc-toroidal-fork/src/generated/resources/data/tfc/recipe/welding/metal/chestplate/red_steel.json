@@ -1,0 +1,15 @@
+{
+  "type": "tfc:welding",
+  "bonus": "copy_best",
+  "first_input": {
+    "item": "tfc:metal/unfinished_chestplate/red_steel"
+  },
+  "result": {
+    "count": 1,
+    "id": "tfc:metal/chestplate/red_steel"
+  },
+  "second_input": {
+    "tag": "c:double_sheets/red_steel"
+  },
+  "tier": 5
+}

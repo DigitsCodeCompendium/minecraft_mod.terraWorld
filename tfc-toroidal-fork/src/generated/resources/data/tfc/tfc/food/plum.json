@@ -1,0 +1,10 @@
+{
+  "decay_modifier": 2.8,
+  "fruit": 1.1,
+  "hunger": 4,
+  "ingredient": {
+    "item": "tfc:food/plum"
+  },
+  "saturation": 0.2,
+  "water": 5.0
+}

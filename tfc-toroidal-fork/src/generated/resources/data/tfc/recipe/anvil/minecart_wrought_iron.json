@@ -1,0 +1,16 @@
+{
+  "type": "tfc:anvil",
+  "ingredient": {
+    "tag": "c:double_sheets/wrought_iron"
+  },
+  "result": {
+    "count": 1,
+    "id": "minecraft:minecart"
+  },
+  "rules": [
+    "hit_not_last",
+    "hit_not_last",
+    "bend_last"
+  ],
+  "tier": 3
+}

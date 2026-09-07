@@ -1,0 +1,33 @@
+{
+  "type": "tfc:advanced_shapeless_crafting",
+  "ingredients": [
+    {
+      "tag": "c:tools/hammer"
+    },
+    {
+      "type": "tfc:and",
+      "children": [
+        {
+          "item": "tfc:pumpkin"
+        },
+        {
+          "type": "tfc:not_rotten"
+        }
+      ]
+    }
+  ],
+  "primary_ingredient": {
+    "tag": "c:tools/hammer"
+  },
+  "remainder": {
+    "modifiers": [
+      {
+        "type": "tfc:damage_crafting_remainder"
+      }
+    ]
+  },
+  "result": {
+    "count": 4,
+    "id": "tfc:food/pumpkin_chunks"
+  }
+}

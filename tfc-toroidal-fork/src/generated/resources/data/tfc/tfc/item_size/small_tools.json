@@ -1,0 +1,18 @@
+{
+  "ingredient": [
+    {
+      "tag": "c:tools/chisel"
+    },
+    {
+      "tag": "c:tools/knife"
+    },
+    {
+      "tag": "c:tools/shear"
+    },
+    {
+      "item": "tfc:firestarter"
+    }
+  ],
+  "size": "large",
+  "weight": "medium"
+}

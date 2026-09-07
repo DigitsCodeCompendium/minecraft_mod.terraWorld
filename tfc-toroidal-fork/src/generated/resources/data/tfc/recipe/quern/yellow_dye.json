@@ -1,0 +1,42 @@
+{
+  "type": "tfc:quern",
+  "ingredient": [
+    {
+      "item": "tfc:plant/calendula"
+    },
+    {
+      "item": "tfc:plant/dandelion"
+    },
+    {
+      "item": "tfc:plant/meads_milkweed"
+    },
+    {
+      "item": "tfc:plant/goldenrod"
+    },
+    {
+      "item": "tfc:plant/snapdragon_yellow"
+    },
+    {
+      "item": "tfc:plant/desert_flame"
+    },
+    {
+      "item": "tfc:plant/yellow_water_lily"
+    },
+    {
+      "item": "tfc:plant/elegant_sunburst_lichen"
+    },
+    {
+      "item": "tfc:plant/yellow_saxifrage"
+    },
+    {
+      "item": "tfc:plant/buttercup"
+    },
+    {
+      "item": "tfc:plant/sunflower"
+    }
+  ],
+  "result": {
+    "count": 2,
+    "id": "minecraft:yellow_dye"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": {
+      "tag": "c:double_ingots/bismuth_bronze"
+    }
+  },
+  "pattern": [
+    "###",
+    " # ",
+    "###"
+  ],
+  "result": {
+    "count": 1,
+    "id": "tfc:metal/anvil/bismuth_bronze"
+  }
+}

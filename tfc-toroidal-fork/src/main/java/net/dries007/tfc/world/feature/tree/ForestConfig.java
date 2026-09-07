@@ -1,0 +1,116 @@
+/*
+ * Licensed under the EUPL, Version 1.2.
+ * You may obtain a copy of the Licence at:
+ * https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+ */
+
+package net.dries007.tfc.world.feature.tree;
+
+import java.util.Optional;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+
+import net.dries007.tfc.util.collections.IWeighted;
+import net.dries007.tfc.world.Codecs;
+import net.dries007.tfc.world.placement.ClimatePlacement;
+
+public record ForestConfig(HolderSet<ConfiguredFeature<?, ?>> entries) implements FeatureConfiguration
+{
+    public static final Codec<ForestConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+        ExtraCodecs.nonEmptyHolderSet(ConfiguredFeature.LIST_CODEC).fieldOf("entries").forGetter(c -> c.entries)
+    ).apply(instance, ForestConfig::new));
+
+    public record Entry(ClimatePlacement climate, Optional<BlockState> bushLog, Optional<BlockState> bushLeaves, Optional<BlockState> fallenLog, Optional<BlockState> fallenLeaves, Optional<IWeighted<BlockState>> groundcover, Holder<ConfiguredFeature<?, ?>> treeFeature, Holder<ConfiguredFeature<?, ?>> deadFeature, Optional<Holder<ConfiguredFeature<?, ?>>> oldGrowthFeature, Optional<Holder<ConfiguredFeature<?, ?>>> krummholz, Optional<Holder<ConfiguredFeature<?, ?>>> soilDiscFeature, int oldGrowthChance, int spoilerOldGrowthChance, int fallenChance, int deadChance, boolean floating) implements FeatureConfiguration
+    {
+        public static final Codec<Entry> CODEC = RecordCodecBuilder.create(instance -> {
+            Codec<IWeighted<BlockState>> codec = Codecs.weightedCodec(Codecs.BLOCK_STATE, "block");
+            return instance.group(
+                ClimatePlacement.CODEC.fieldOf("climate").forGetter(c -> c.climate),
+                Codecs.BLOCK_STATE.optionalFieldOf("bush_log").forGetter(c -> c.bushLog),
+                Codecs.BLOCK_STATE.optionalFieldOf("bush_leaves").forGetter(c -> c.bushLeaves),
+                Codecs.BLOCK_STATE.optionalFieldOf("fallen_log").forGetter(c -> c.fallenLog),
+                Codecs.BLOCK_STATE.optionalFieldOf("fallen_leaves").forGetter(c -> c.fallenLeaves),
+                codec.optionalFieldOf("groundcover").forGetter(c -> c.groundcover),
+                ConfiguredFeature.CODEC.fieldOf("normal_tree").forGetter(c -> c.treeFeature),
+                ConfiguredFeature.CODEC.fieldOf("dead_tree").forGetter(c -> c.deadFeature),
+                ConfiguredFeature.CODEC.optionalFieldOf("old_growth_tree").forGetter(c -> c.oldGrowthFeature),
+                ConfiguredFeature.CODEC.optionalFieldOf("krummholz").forGetter(c -> c.krummholz),
+                ConfiguredFeature.CODEC.optionalFieldOf("soil_disc").forGetter(c -> c.soilDiscFeature),
+                Codec.INT.optionalFieldOf("old_growth_chance", 6).forGetter(c -> c.oldGrowthChance),
+                Codec.INT.optionalFieldOf("spoiler_old_growth_chance", 200).forGetter(c -> c.spoilerOldGrowthChance),
+                Codec.INT.optionalFieldOf("fallen_tree_chance", 14).forGetter(c -> c.fallenChance),
+                Codec.INT.optionalFieldOf("dead_chance", 75).forGetter(c -> c.deadChance),
+                Codec.BOOL.optionalFieldOf("floating", false).forGetter(c -> c.floating)
+            ).apply(instance, Entry::new);
+        });
+
+        public boolean isValid(float temperature, float groundwater, float rainVar, float elevation)
+        {
+            final float adjustedRainVar = climate.isRainVarianceAbsolute() ? Math.abs(rainVar) : rainVar;
+            return groundwater >= climate.getMinGroundwater() && groundwater <= climate.getMaxGroundwater()
+                && adjustedRainVar >= climate.getMinRainVariance() && adjustedRainVar <= climate().getMaxRainVariance()
+                && temperature >= climate.getMinTemp() && temperature <= climate.getMaxTemp()
+                && elevation >= climate.getMinElevation() && elevation <= climate.getMaxElevation();
+        }
+
+        public float distanceFromMean(float temperature, float groundwater, float rainVar, float elevation)
+        {
+            final float adjustedRainVar = climate.isRainVarianceAbsolute() ? Math.abs(rainVar) : rainVar;
+
+            final float tempDist = (temperature - getAverageTemp()) * 10f; // Normalize everything to a 0-500 scale
+            final float waterDist = groundwater - getAverageGroundwater();
+            final float rainVarDist = (adjustedRainVar - getAverageRainVar()) * 250f;
+            final float elevationDistance = (elevation - getAverageElevation()) * 5;
+
+            return tempDist + waterDist + rainVarDist + elevationDistance;
+        }
+
+        public float getAverageTemp()
+        {
+            return (climate.getMaxTemp() - climate.getMinTemp()) / 2;
+        }
+
+        public ClimatePlacement getClimatePlacement()
+        {
+            return climate;
+        }
+
+        public float getAverageGroundwater()
+        {
+            return (climate.getMaxGroundwater() - climate.getMinGroundwater()) / 2;
+        }
+
+        public float getAverageRainVar()
+        {
+            return (climate.getMaxRainVariance() - climate.getMinRainVariance()) / 2;
+        }
+
+        public float getAverageElevation()
+        {
+            return (climate.getMaxElevation() - climate.getMinElevation()) / 2f;
+        }
+
+        public ConfiguredFeature<?, ?> getFeature()
+        {
+            return treeFeature.value();
+        }
+
+        public ConfiguredFeature<?, ?> getDeadFeature()
+        {
+            return deadFeature.value();
+        }
+
+
+        public ConfiguredFeature<?, ?> getOldGrowthFeature()
+        {
+            return oldGrowthFeature.orElse(treeFeature).value();
+        }
+    }
+
+}

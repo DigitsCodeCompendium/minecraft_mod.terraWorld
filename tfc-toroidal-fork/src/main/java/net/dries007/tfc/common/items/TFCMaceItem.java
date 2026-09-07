@@ -1,0 +1,35 @@
+/*
+ * Licensed under the EUPL, Version 1.2.
+ * You may obtain a copy of the Licence at:
+ * https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+ */
+
+package net.dries007.tfc.common.items;
+
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.MaceItem;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.common.ItemAbility;
+
+public class TFCMaceItem extends MaceItem
+{
+    public TFCMaceItem(Properties properties)
+    {
+        super(properties);
+    }
+
+    @Override
+    public float getAttackDamageBonus(Entity target, float damage, DamageSource damageSource)
+    {
+        return 0f;
+    }
+
+    @Override
+    public boolean canPerformAction(ItemStack stack, ItemAbility toolAction)
+    {
+        return super.canPerformAction(stack, toolAction) && toolAction != ItemAbilities.SWORD_SWEEP;
+    }
+
+}

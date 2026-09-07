@@ -1,0 +1,7 @@
+{
+  "type": "tfc:landslide",
+  "ingredient": [
+    "tfc:kaolin_clay_grass"
+  ],
+  "result": "tfc:red_kaolin_clay"
+}

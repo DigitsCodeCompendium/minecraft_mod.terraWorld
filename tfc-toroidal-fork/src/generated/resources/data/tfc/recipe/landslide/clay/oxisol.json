@@ -1,0 +1,9 @@
+{
+  "type": "tfc:landslide",
+  "ingredient": [
+    "tfc:clay/oxisol",
+    "tfc:clay_grass/oxisol",
+    "tfc:clay_duff/oxisol"
+  ],
+  "result": "tfc:clay/oxisol"
+}

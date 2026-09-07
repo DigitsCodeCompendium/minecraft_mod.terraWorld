@@ -1,0 +1,12 @@
+{
+  "type": "tfc:landslide",
+  "ingredient": [
+    "tfc:dirt/fluvisol",
+    "tfc:grass/fluvisol",
+    "tfc:duff/fluvisol",
+    "tfc:grass_path/fluvisol",
+    "tfc:farmland/fluvisol",
+    "tfc:rooted_dirt/fluvisol"
+  ],
+  "result": "tfc:dirt/fluvisol"
+}

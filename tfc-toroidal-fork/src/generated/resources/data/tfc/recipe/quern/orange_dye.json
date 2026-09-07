@@ -1,0 +1,39 @@
+{
+  "type": "tfc:quern",
+  "ingredient": [
+    {
+      "item": "tfc:plant/butterfly_milkweed"
+    },
+    {
+      "item": "tfc:plant/canna"
+    },
+    {
+      "item": "tfc:plant/nasturtium"
+    },
+    {
+      "item": "tfc:plant/strelitzia"
+    },
+    {
+      "item": "tfc:plant/tulip_orange"
+    },
+    {
+      "item": "tfc:plant/water_canna"
+    },
+    {
+      "item": "tfc:plant/marigold"
+    },
+    {
+      "item": "tfc:plant/flame_vine"
+    },
+    {
+      "item": "tfc:plant/palash"
+    },
+    {
+      "item": "tfc:plant/qantu"
+    }
+  ],
+  "result": {
+    "count": 2,
+    "id": "minecraft:orange_dye"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "name": "加熱",
+  "category": "tfc:core_mechanics",
+  "icon": "tfc:textures/gui/book/icons/heating.png",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "將物品加熱可以將其轉化為另一種物品或熔化為液體。$(l:getting_started/firepit)篝火$()、$(l:getting_started/pit_kiln)坑窯$()或$(l:metalworking/charcoal_forge)木炭爐$()等設備都可以加熱物品，它們的工作原理都大同小異。當將物品放入這些設備時，物品就會逐漸升温。物品的工具提示中會説明它當前的温度。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "物品的温度是用顏色來表示的。每個顏色表示了物品所處温度的區間：$(br2)$(7)$(bold)暖$()：$(cfg:heat:1) - $(cfg:heat:80)$(br)$(7)$(bold)熱$()：$(cfg:heat:80) - $(cfg:heat:210)$(br)$(7)$(bold)灼熱$()：$(cfg:heat:210) - $(cfg:heat:480)$(br)$(4)$(bold)淡紅$()：$(cfg:heat:480) - $(cfg:heat:580)$(br)$(bold)$(4)暗紅$()：$(cfg:heat:580) - $(cfg:heat:730)$(br)$(c)$(bold)亮紅$()：$(cfg:heat:730) - $(cfg:heat:930)$(br)$(6)$(bold)橙$()：$(cfg:heat:930) - $(cfg:heat:1100)$(br)$(e)$(bold)$(t:Yellow)黃$()：$(cfg:heat:1100) - $(cfg:heat:1300)$(br)$(e)$(t:Yellow White)$(bold)黃白$()：$(cfg:heat:1300) - $(cfg:heat:1400)$(br)$(d)$(bold)$(t:White)白$()：$(cfg:heat:1400) - $(cfg:heat:1500)$(br)$(d)$(bold)$(t:Brilliant White)熾白$()： >$(cfg:heat:1500)"
+    }
+  ],
+  "read_by_default": true,
+  "sortnum": 3
+}

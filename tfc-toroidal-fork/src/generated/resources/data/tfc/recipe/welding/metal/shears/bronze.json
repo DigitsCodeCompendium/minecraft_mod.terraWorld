@@ -1,0 +1,15 @@
+{
+  "type": "tfc:welding",
+  "bonus": "copy_worst",
+  "first_input": {
+    "item": "tfc:metal/knife_blade/bronze"
+  },
+  "result": {
+    "count": 1,
+    "id": "tfc:metal/shears/bronze"
+  },
+  "second_input": {
+    "item": "tfc:metal/knife_blade/bronze"
+  },
+  "tier": 1
+}

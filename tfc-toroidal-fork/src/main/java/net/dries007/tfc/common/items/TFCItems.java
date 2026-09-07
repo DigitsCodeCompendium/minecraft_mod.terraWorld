@@ -1,0 +1,460 @@
+/*
+ * Licensed under the EUPL, Version 1.2.
+ * You may obtain a copy of the Licence at:
+ * https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+ */
+
+package net.dries007.tfc.common.items;
+
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.Supplier;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.HangingSignItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.MobBucketItem;
+import net.minecraft.world.item.ShovelItem;
+import net.minecraft.world.item.SignItem;
+import net.minecraft.world.item.StandingAndWallBlockItem;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.component.BundleContents;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.common.DeferredSpawnEggItem;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+import net.dries007.tfc.common.Lore;
+import net.dries007.tfc.common.TFCCreativeTabs;
+import net.dries007.tfc.common.TFCTags;
+import net.dries007.tfc.common.TFCTiers;
+import net.dries007.tfc.common.blocks.TFCBlocks;
+import net.dries007.tfc.common.blocks.crop.Crop;
+import net.dries007.tfc.common.blocks.plant.coral.Coral;
+import net.dries007.tfc.common.blocks.rock.Ore;
+import net.dries007.tfc.common.blocks.rock.Rock;
+import net.dries007.tfc.common.blocks.rock.RockCategory;
+import net.dries007.tfc.common.blocks.wood.Wood;
+import net.dries007.tfc.common.component.TFCComponents;
+import net.dries007.tfc.common.component.food.Nutrient;
+import net.dries007.tfc.common.component.glass.GlassOperation;
+import net.dries007.tfc.common.component.glass.GlassOperations;
+import net.dries007.tfc.common.entities.TFCEntities;
+import net.dries007.tfc.common.entities.aquatic.Fish;
+import net.dries007.tfc.common.fluids.FluidId;
+import net.dries007.tfc.common.fluids.TFCFluids;
+import net.dries007.tfc.config.TFCConfig;
+import net.dries007.tfc.util.Helpers;
+import net.dries007.tfc.util.Metal;
+import net.dries007.tfc.util.registry.IdHolder;
+import net.dries007.tfc.util.registry.RegistryHolder;
+
+import static net.dries007.tfc.TerraFirmaCraft.*;
+
+/**
+ * Collection of all TFC items.
+ * Organized by {@link TFCCreativeTabs}
+ * Unused is as the registry object fields themselves may be unused, but they are required to register each item.
+ * Whenever possible, avoid using hardcoded references to these, prefer tags or recipes.
+ */
+@SuppressWarnings("unused")
+public final class TFCItems
+{
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Registries.ITEM, MOD_ID);
+
+    // Ores
+
+    public static final Map<Ore, ItemId> ORES = Helpers.mapOf(Ore.class, ore -> !ore.isGraded(), type ->
+        register("ore/" + type.name())
+    );
+    public static final Map<Ore, Map<Ore.Grade, ItemId>> GRADED_ORES = Helpers.mapOf(Ore.class, Ore::isGraded, ore ->
+        Helpers.mapOf(Ore.Grade.class, grade ->
+            register("ore/" + grade.name() + '_' + ore.name())
+        )
+    );
+
+    public static final Map<Ore, ItemId> GEMS = Helpers.mapOf(Ore.class, Ore::isGem, ore ->
+        register("gem/" + ore.name())
+    );
+
+    // Rock Stuff
+
+    public static final Map<RockCategory, Map<RockCategory.ItemType, ItemId>> ROCK_TOOLS = Helpers.mapOf(RockCategory.class, category ->
+        Helpers.mapOf(RockCategory.ItemType.class, type ->
+            register("stone/" + type.name() + "/" + category.name(), () -> type.create(category))
+        )
+    );
+
+    public static final Map<Rock, ItemId> BRICKS = Helpers.mapOf(Rock.class, type ->
+        register("brick/" + type.name(), type.createItemProperties())
+    );
+
+    // Metal
+
+    public static final Map<Metal, Map<Metal.ItemType, ItemId>> METAL_ITEMS = Helpers.mapOf(Metal.class, metal ->
+        Helpers.mapOf(Metal.ItemType.class, type -> type.has(metal), type ->
+            register("metal/" + type.name() + "/" + metal.name(), () -> type.create(metal))
+        )
+    );
+
+    // Wood
+
+    public static final Map<Wood, ItemId> LUMBER = Helpers.mapOf(Wood.class, wood -> register("wood/lumber/" + wood.name()));
+
+    public static final Map<Wood, ItemId> SUPPORTS = Helpers.mapOf(Wood.class, wood ->
+        register("wood/support/" + wood.name(), () -> new StandingAndWallBlockItem(TFCBlocks.WOODS.get(wood).get(Wood.BlockType.VERTICAL_SUPPORT).get(), TFCBlocks.WOODS.get(wood).get(Wood.BlockType.HORIZONTAL_SUPPORT).get(), new Properties(), Direction.DOWN))
+    );
+
+    public static final Map<Wood, ItemId> BOATS = Helpers.mapOf(Wood.class, wood -> register("wood/boat/" + wood.name(), () -> new TFCBoatItem(TFCEntities.BOATS.get(wood), new Properties())));
+
+    public static final Map<Wood, ItemId> CHEST_MINECARTS = Helpers.mapOf(Wood.class, wood -> register("wood/chest_minecart/" + wood.name(), () -> new TFCMinecartItem(new Properties(), TFCEntities.CHEST_MINECART, () -> TFCBlocks.WOODS.get(wood).get(Wood.BlockType.CHEST).get().asItem())));
+
+    public static final Map<Wood, ItemId> SIGNS = Helpers.mapOf(Wood.class, wood -> register("wood/sign/" + wood.name(), () -> new SignItem(new Properties(), TFCBlocks.WOODS.get(wood).get(Wood.BlockType.SIGN).get(), TFCBlocks.WOODS.get(wood).get(Wood.BlockType.WALL_SIGN).get())));
+
+    public static final Map<Wood, Map<Metal, ItemId>> HANGING_SIGNS = Helpers.mapOf(Wood.class, wood ->
+        Helpers.mapOf(Metal.class, Metal::allParts, metal ->
+            register("wood/hanging_sign/" + metal.name() + "/" + wood.name(), () -> new HangingSignItem(TFCBlocks.CEILING_HANGING_SIGNS.get(wood).get(metal).get(), TFCBlocks.WALL_HANGING_SIGNS.get(wood).get(metal).get(), new Properties().rarity(metal.rarity())))
+        )
+    );
+
+    // Food
+
+    public static final ItemId EMPTY_JAR = register("empty_jar"); // Must register before used as crafting remainder
+
+    public static final Map<Food, ItemId> FOOD = Helpers.mapOf(Food.class, food ->
+        register("food/" + food.name(), () -> new Item(new Properties()))
+    );
+    public static final Map<Food, ItemId> FRUIT_PRESERVES = Helpers.mapOf(Food.class, Food::hasJam, food ->
+        register("jar/" + food.name(), () -> new Item(new Properties().component(Lore.TYPE, Lore.SEALED)))
+    );
+    public static final Map<Food, ItemId> UNSEALED_FRUIT_PRESERVES = Helpers.mapOf(Food.class, Food::hasJam, food ->
+        register("jar/" + food.name() + "_unsealed", () -> new Item(new Properties().component(Lore.TYPE, Lore.UNSEALED).craftRemainder(TFCItems.EMPTY_JAR.asItem())))
+    );
+    public static final Map<Food, ItemId> JAM = Helpers.mapOf(Food.class, Food::hasJam, food ->
+        register(food.name() + "_jam", () -> new Item(new Properties()))
+    );
+    public static final Map<Nutrient, ItemId> SOUPS = Helpers.mapOf(Nutrient.class, nutrient ->
+        register("food/" + nutrient.name() + "_soup", () -> new Item(new Properties()))
+    );
+    public static final Map<Nutrient, ItemId> SALADS = Helpers.mapOf(Nutrient.class, nutrient ->
+        register("food/" + nutrient.name() + "_salad", () -> new Item(new Properties()))
+    );
+
+    // Flora
+
+    public static final Map<Crop, ItemId> CROP_SEEDS = Helpers.mapOf(Crop.class, crop ->
+        register("seeds/" + crop.name(), () -> new SeedItem(crop, TFCBlocks.CROPS.get(crop).get(), TFCBlocks.DEAD_CROPS.get(crop).get(), new Properties()))
+    );
+
+    public static final ItemId FLOWER_CUTTING = register("flower_cutting", () -> new FlowerCuttingItem(new Properties()));
+
+    public static final Map<Coral, ItemId> CORAL_FANS = Helpers.mapOf(Coral.class, color ->
+        register("coral/" + color.toString() + "_coral_fan", () -> new StandingAndWallBlockItem(TFCBlocks.CORAL.get(color).get(Coral.BlockType.CORAL_FAN).get(), TFCBlocks.CORAL.get(color).get(Coral.BlockType.CORAL_WALL_FAN).get(), new Properties(), Direction.DOWN))
+    );
+
+    public static final Map<Coral, ItemId> DEAD_CORAL_FANS = Helpers.mapOf(Coral.class, color ->
+        register("coral/" + color.toString() + "_dead_coral_fan", () -> new StandingAndWallBlockItem(TFCBlocks.CORAL.get(color).get(Coral.BlockType.DEAD_CORAL_FAN).get(), TFCBlocks.CORAL.get(color).get(Coral.BlockType.DEAD_CORAL_WALL_FAN).get(), new Properties(), Direction.DOWN))
+    );
+
+    // Decorations
+
+    public static final ItemId ENTISOL_MUD_BRICK = register("mud_brick/entisol");
+    public static final ItemId ARIDISOL_MUD_BRICK = register("mud_brick/aridisol");
+    public static final ItemId OXISOL_MUD_BRICK = register("mud_brick/oxisol");
+    public static final ItemId FLUVISOL_MUD_BRICK = register("mud_brick/fluvisol");
+    public static final ItemId ANDISOL_MUD_BRICK = register("mud_brick/andisol");
+    public static final ItemId PODZOL_MUD_BRICK = register("mud_brick/podzol");
+    public static final ItemId ALFISOL_MUD_BRICK = register("mud_brick/alfisol");
+    public static final ItemId MOLLISOL_MUD_BRICK = register("mud_brick/mollisol");
+
+    public static final ItemId ALABASTER_BRICK = register("alabaster_brick");
+    public static final ItemId TORCH = register("torch", () -> new TorchItem(TFCBlocks.TORCH.get(), TFCBlocks.WALL_TORCH.get(), new Properties()));
+    public static final ItemId DEAD_TORCH = register("dead_torch", () -> new StandingAndWallBlockItem(TFCBlocks.DEAD_TORCH.get(), TFCBlocks.DEAD_WALL_TORCH.get(), new Properties(), Direction.DOWN));
+
+    // Misc
+
+    public static final Map<HideItemType, Map<HideItemType.Size, ItemId>> HIDES = Helpers.mapOf(HideItemType.class, type ->
+        Helpers.mapOf(HideItemType.Size.class, size ->
+            register(size.name() + '_' + type.name() + "_hide", () -> new Item(new Properties()))
+        )
+    );
+
+    public static final Map<Powder, ItemId> POWDERS = Helpers.mapOf(Powder.class, powder -> register("powder/" + powder.name()));
+    public static final Map<Ore, ItemId> ORE_POWDERS = Helpers.mapOf(Ore.class, Ore::hasPowder, ore -> register("powder/" + ore.name()));
+
+    public static final ItemId CERAMIC_BLOWPIPE = register("ceramic_blowpipe", () -> new BlowpipeItem(new Properties()));
+    public static final ItemId BLOWPIPE = register("blowpipe", () -> new BlowpipeItem(new Properties()));
+    public static final ItemId CERAMIC_BLOWPIPE_WITH_GLASS = register("ceramic_blowpipe_with_glass", () -> new GlassBlowpipeItem(new Properties().component(TFCComponents.GLASS, GlassOperations.DEFAULT), 0.1f));
+    public static final ItemId BLOWPIPE_WITH_GLASS = register("blowpipe_with_glass", () -> new GlassBlowpipeItem(new Properties().component(TFCComponents.GLASS, GlassOperations.DEFAULT), 0f));
+    public static final ItemId JACKS = register("jacks", () -> new GlassworkingItem(new Properties(), GlassOperation.PINCH));
+    public static final ItemId PADDLE = register("paddle", () -> new GlassworkingItem(new Properties(), GlassOperation.FLATTEN));
+    public static final ItemId GEM_SAW = register("gem_saw", () -> new GemSawItem(TFCTiers.BRONZE, new Properties()));
+    public static final ItemId SILICA_GLASS_BATCH = register("silica_glass_batch", new Properties().component(Lore.TYPE, Lore.SILICA));
+    public static final ItemId HEMATITIC_GLASS_BATCH = register("hematitic_glass_batch", new Properties().component(Lore.TYPE, Lore.HEMATITIC));
+    public static final ItemId OLIVINE_GLASS_BATCH = register("olivine_glass_batch", new Properties().component(Lore.TYPE, Lore.OLIVINE));
+    public static final ItemId VOLCANIC_GLASS_BATCH = register("volcanic_glass_batch", new Properties().component(Lore.TYPE, Lore.VOLCANIC));
+    public static final ItemId LAMP_GLASS = register("lamp_glass");
+    public static final ItemId LENS = register("lens");
+    public static final ItemId SILICA_GLASS_BOTTLE = register("silica_glass_bottle", () -> new GlassBottleItem(new Properties().component(Lore.TYPE, Lore.SILICA), TFCConfig.SERVER.silicaGlassBottleCapacity, TFCConfig.SERVER.silicaGlassBottleBreakChance, TFCTags.Fluids.USABLE_IN_JUG));
+    public static final ItemId HEMATITIC_GLASS_BOTTLE = register("hematitic_glass_bottle", () -> new GlassBottleItem(new Properties().component(Lore.TYPE, Lore.HEMATITIC), TFCConfig.SERVER.hematiticGlassBottleCapacity, TFCConfig.SERVER.hematiticGlassBottleBreakChance, TFCTags.Fluids.USABLE_IN_JUG));
+    public static final ItemId VOLCANIC_GLASS_BOTTLE = register("volcanic_glass_bottle", () -> new GlassBottleItem(new Properties().component(Lore.TYPE, Lore.VOLCANIC), TFCConfig.SERVER.volcanicGlassBottleCapacity, TFCConfig.SERVER.volcanicGlassBottleBreakChance, TFCTags.Fluids.USABLE_IN_JUG));
+    public static final ItemId OLIVINE_GLASS_BOTTLE = register("olivine_glass_bottle", () -> new GlassBottleItem(new Properties().component(Lore.TYPE, Lore.OLIVINE), TFCConfig.SERVER.olivineGlassBottleCapacity, TFCConfig.SERVER.olivineGlassBottleBreakChance, TFCTags.Fluids.USABLE_IN_JUG));
+
+    public static final ItemId EMPTY_JAR_WITH_LID = register("empty_jar_with_lid");
+    public static final ItemId JAR_LID = register("jar_lid");
+    public static final ItemId BASKET = register("basket", () -> new TFCBundleItem(new Properties().component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY)));
+    public static final ItemId BONE_NEEDLE = register("bone_needle", () -> new Item(new Properties().durability(64)));
+    public static final ItemId OBSIDIAN_MACUAHUITL = register("obsidian_macuahuitl", () -> new SwordItem(TFCTiers.OBSIDIAN, new Properties().attributes(ToolItem.productAttributes(TFCTiers.OBSIDIAN, 1f, -2.4f))));
+    public static final ItemId OBSIDIAN_AXE_HEAD = register("obsidian_axe_head");
+    public static final ItemId OBSIDIAN_AXE = register("obsidian_axe", () -> new AxeItem(TFCTiers.OBSIDIAN, new Properties().attributes(ToolItem.productAttributes(TFCTiers.OBSIDIAN, 1.5f, -3.2f))));
+    public static final ItemId OBSIDIAN_HAMMER_HEAD = register("obsidian_hammer_head");
+    public static final ItemId OBSIDIAN_HAMMER = register("obsidian_hammer", () -> new HammerItem(TFCTiers.OBSIDIAN, new Properties().attributes(ToolItem.productAttributes(TFCTiers.OBSIDIAN, 1.0f, -3.0f))));
+    public static final ItemId OBSIDIAN_HOE_HEAD = register("obsidian_hoe_head");
+    public static final ItemId OBSIDIAN_HOE = register("obsidian_hoe", () -> new TFCHoeItem(TFCTiers.OBSIDIAN, new Properties().attributes(ToolItem.productAttributes(TFCTiers.OBSIDIAN, 0.5f, -3.0f))));
+    public static final ItemId OBSIDIAN_JAVELIN_HEAD = register("obsidian_javelin_head");
+    public static final ItemId OBSIDIAN_JAVELIN = register("obsidian_javelin", () -> new JavelinItem(TFCTiers.OBSIDIAN, new Properties().attributes(ToolItem.productAttributes(TFCTiers.OBSIDIAN, 0.7f, -2.2f))));
+    public static final ItemId OBSIDIAN_KNIFE_HEAD = register("obsidian_knife_head");
+    public static final ItemId OBSIDIAN_KNIFE = register("obsidian_knife", () -> new ToolItem(TFCTiers.OBSIDIAN, TFCTags.Blocks.MINEABLE_WITH_KNIFE, new Properties().attributes(ToolItem.productAttributes(TFCTiers.OBSIDIAN, 0.6f, -2.0f))));
+    public static final ItemId OBSIDIAN_SHOVEL_HEAD = register("obsidian_shovel_head");
+    public static final ItemId OBSIDIAN_SHOVEL = register("obsidian_shovel", () -> new ShovelItem(TFCTiers.OBSIDIAN, new Properties().attributes(ToolItem.productAttributes(TFCTiers.OBSIDIAN, 0.875f, -3.0f))));
+    public static final ItemId BLANK_DISC = register("blank_disc");
+    public static final ItemId BLUBBER = register("blubber");
+    public static final ItemId BRASS_MECHANISMS = register("brass_mechanisms");
+    public static final ItemId BURLAP_CLOTH = register("burlap_cloth");
+    public static final ItemId COMPOST = register("compost");
+    public static final ItemId CACTUS_WOOD = register("cactus_wood");
+    public static final ItemId DAUB = register("daub");
+    public static final ItemId DIRTY_JUTE_NET = register("dirty_jute_net");
+    public static final ItemId DRIED_CACTUS_WOOD = register("dried_cactus_wood");
+    public static final ItemId FIRE_CLAY = register("fire_clay");
+    public static final ItemId FIRESTARTER = register("firestarter", () -> new FirestarterItem(new Properties().durability(8)));
+    public static final ItemId FLINT_AND_PYRITE = register("flint_and_pyrite", () -> new FlintAndPyriteItem(new Properties().durability(128)));
+    public static final ItemId GOAT_HORN = register("goat_horn");
+    public static final ItemId GLOW_ARROW = register("glow_arrow", () -> new GlowArrowItem(new Properties()));
+    public static final ItemId GLUE = register("glue");
+    public static final ItemId ALFALFA = register("alfalfa");
+    public static final ItemId CANOLA = register("canola");
+    public static final ItemId JUTE = register("jute");
+    public static final ItemId JUTE_FIBER = register("jute_fiber");
+    public static final ItemId JUTE_NET = register("jute_net");
+    public static final ItemId KAOLIN_CLAY = register("kaolin_clay");
+    public static final ItemId HANDSTONE = register("handstone", () -> new Item(new Properties().durability(250)));
+    public static final ItemId MORTAR = register("mortar");
+    public static final ItemId OLIVE_PASTE = register("olive_paste");
+    public static final ItemId CANOLA_PASTE = register("canola_paste");
+    public static final ItemId PAPYRUS = register("papyrus");
+    public static final ItemId PAPYRUS_STRIP = register("papyrus_strip");
+    public static final ItemId PURE_NITROGEN = register("pure_nitrogen");
+    public static final ItemId PURE_PHOSPHORUS = register("pure_phosphorus");
+    public static final ItemId PURE_POTASSIUM = register("pure_potassium");
+    public static final ItemId ROPE = register("rope", () -> new RopeItem(new Properties()));
+    public static final ItemId ROTTEN_COMPOST = register("rotten_compost", () -> new RottenCompostItem(new Properties()));
+    public static final ItemId SILK_CLOTH = register("silk_cloth");
+    public static final ItemId SANDPAPER = register("sandpaper", () -> new Item(new Properties().durability(40)));
+    public static final ItemId SOAKED_PAPYRUS_STRIP = register("soaked_papyrus_strip");
+    public static final ItemId SOOT = register("soot");
+    public static final ItemId SPINDLE = register("spindle", () -> new Item(new Properties().durability(40)));
+    public static final ItemId STICK_BUNCH = register("stick_bunch");
+    public static final ItemId STICK_BUNDLE = register("stick_bundle");
+    public static final ItemId STRAW = register("straw");
+    public static final ItemId TREATED_HIDE = register("treated_hide");
+    public static final ItemId UNREFINED_PAPER = register("unrefined_paper");
+    public static final ItemId WOODEN_BUCKET = register("wooden_bucket", () -> new FluidContainerItem(new Properties(), TFCConfig.SERVER.woodenBucketCapacity, TFCTags.Fluids.USABLE_IN_WOODEN_BUCKET, true, TFCConfig.SERVER.woodenBucketCanPlaceSources));
+    public static final ItemId WOOL = register("wool");
+    public static final ItemId WOOL_CLOTH = register("wool_cloth", () -> new GlassworkingItem(new Properties(), GlassOperation.ROLL));
+    public static final ItemId WOOL_YARN = register("wool_yarn");
+    public static final ItemId WROUGHT_IRON_GRILL = register("wrought_iron_grill");
+    public static final ItemId RAW_IRON_BLOOM = register("raw_iron_bloom");
+    public static final ItemId REFINED_IRON_BLOOM = register("refined_iron_bloom");
+
+    public static final ItemId EMPTY_PAN = register("pan/empty", () -> new EmptyPanItem(new Properties()));
+    public static final ItemId FILLED_PAN = register("pan/filled", () -> new PanItem(new Properties().stacksTo(1)));
+
+    public static final ItemId LATTICE_WINDMILL_BLADE = register("lattice_windmill_blade", () -> new WindmillBladeItem(new Properties()));
+    public static final ItemId RUSTIC_WINDMILL_BLADE = register("rustic_windmill_blade", () -> new WindmillBladeItem(new Properties()));
+    public static final Map<DyeColor, ItemId> WINDMILL_BLADES = Helpers.mapOf(DyeColor.class, color ->
+        register("windmill_blade/" + color.getSerializedName(), () -> new WindmillBladeItem(new Properties()))
+    );
+    public static final Map<Fish, ItemId> FRESHWATER_FISH_EGGS = Helpers.mapOf(Fish.class, fish -> registerSpawnEgg(TFCEntities.FRESHWATER_FISH.get(fish)));
+
+    public static final ItemId COD_EGG = registerSpawnEgg(TFCEntities.COD);
+    public static final ItemId PUFFERFISH_EGG = registerSpawnEgg(TFCEntities.PUFFERFISH);
+    public static final ItemId TROPICAL_FISH_EGG = registerSpawnEgg(TFCEntities.TROPICAL_FISH);
+    public static final ItemId JELLYFISH_EGG = registerSpawnEgg(TFCEntities.JELLYFISH);
+    public static final ItemId LOBSTER_EGG = registerSpawnEgg(TFCEntities.LOBSTER);
+    public static final ItemId CRAYFISH_EGG = registerSpawnEgg(TFCEntities.CRAYFISH);
+    public static final ItemId ISOPOD_EGG = registerSpawnEgg(TFCEntities.ISOPOD);
+    public static final ItemId HORSESHOE_CRAB_EGG = registerSpawnEgg(TFCEntities.HORSESHOE_CRAB);
+    public static final ItemId DOLPHIN_EGG = registerSpawnEgg(TFCEntities.DOLPHIN);
+    public static final ItemId ORCA_EGG = registerSpawnEgg(TFCEntities.ORCA);
+    public static final ItemId MANATEE_EGG = registerSpawnEgg(TFCEntities.MANATEE);
+    public static final ItemId TURTLE_EGG = registerSpawnEgg(TFCEntities.TURTLE);
+    public static final ItemId PENGUIN_EGG = registerSpawnEgg(TFCEntities.PENGUIN);
+    public static final ItemId LEOPARD_SEAL_SPAWN_EGG = registerSpawnEgg(TFCEntities.LEOPARD_SEAL);
+    public static final ItemId FROG_EGG = registerSpawnEgg(TFCEntities.FROG);
+    public static final ItemId POLAR_BEAR_EGG = registerSpawnEgg(TFCEntities.POLAR_BEAR);
+    public static final ItemId GRIZZLY_BEAR_EGG = registerSpawnEgg(TFCEntities.GRIZZLY_BEAR);
+    public static final ItemId BLACK_BEAR_EGG = registerSpawnEgg(TFCEntities.BLACK_BEAR);
+    public static final ItemId COUGAR_EGG = registerSpawnEgg(TFCEntities.COUGAR);
+    public static final ItemId PANTHER_EGG = registerSpawnEgg(TFCEntities.PANTHER);
+    public static final ItemId LION_EGG = registerSpawnEgg(TFCEntities.LION);
+    public static final ItemId SABERTOOTH_EGG = registerSpawnEgg(TFCEntities.SABERTOOTH);
+    public static final ItemId TIGER_EGG = registerSpawnEgg(TFCEntities.TIGER);
+    public static final ItemId CROCODILE_EGG = registerSpawnEgg(TFCEntities.CROCODILE);
+    public static final ItemId WOLF_EGG = registerSpawnEgg(TFCEntities.WOLF);
+    public static final ItemId HYENA_EGG = registerSpawnEgg(TFCEntities.HYENA);
+    public static final ItemId DIREWOLF_EGG = registerSpawnEgg(TFCEntities.DIREWOLF);
+    public static final ItemId SQUID_EGG = registerSpawnEgg(TFCEntities.SQUID);
+    public static final ItemId OCTOPOTEUTHIS_EGG = registerSpawnEgg(TFCEntities.OCTOPOTEUTHIS);
+    public static final ItemId PIG_EGG = registerSpawnEgg(TFCEntities.PIG);
+    public static final ItemId COW_EGG = registerSpawnEgg(TFCEntities.COW);
+    public static final ItemId GOAT_EGG = registerSpawnEgg(TFCEntities.GOAT);
+    public static final ItemId YAK_EGG = registerSpawnEgg(TFCEntities.YAK);
+    public static final ItemId ALPACA_EGG = registerSpawnEgg(TFCEntities.ALPACA);
+    public static final ItemId SHEEP_EGG = registerSpawnEgg(TFCEntities.SHEEP);
+    public static final ItemId MUSK_OX_EGG = registerSpawnEgg(TFCEntities.MUSK_OX);
+    public static final ItemId CHICKEN_EGG = registerSpawnEgg(TFCEntities.CHICKEN);
+    public static final ItemId DUCK_EGG = registerSpawnEgg(TFCEntities.DUCK);
+    public static final ItemId QUAIL_EGG = registerSpawnEgg(TFCEntities.QUAIL);
+    public static final ItemId RABBIT_EGG = registerSpawnEgg(TFCEntities.RABBIT);
+    public static final ItemId FOX_EGG = registerSpawnEgg(TFCEntities.FOX);
+    public static final ItemId BOAR_EGG = registerSpawnEgg(TFCEntities.BOAR);
+    public static final ItemId WILDEBEEST_EGG = registerSpawnEgg(TFCEntities.WILDEBEEST);
+    public static final ItemId BISON_EGG = registerSpawnEgg(TFCEntities.BISON);
+    public static final ItemId OCELOT_EGG = registerSpawnEgg(TFCEntities.OCELOT);
+    public static final ItemId BONGO_EGG = registerSpawnEgg(TFCEntities.BONGO);
+    public static final ItemId CARIBOU_EGG = registerSpawnEgg(TFCEntities.CARIBOU);
+    public static final ItemId DEER_EGG = registerSpawnEgg(TFCEntities.DEER);
+    public static final ItemId GAZELLE_EGG = registerSpawnEgg(TFCEntities.GAZELLE);
+    public static final ItemId MOOSE_EGG = registerSpawnEgg(TFCEntities.MOOSE);
+    public static final ItemId GROUSE_EGG = registerSpawnEgg(TFCEntities.GROUSE);
+    public static final ItemId PHEASANT_EGG = registerSpawnEgg(TFCEntities.PHEASANT);
+    public static final ItemId TURKEY_EGG = registerSpawnEgg(TFCEntities.TURKEY);
+    public static final ItemId PEAFOWL_EGG = registerSpawnEgg(TFCEntities.PEAFOWL);
+    public static final ItemId RAT_EGG = registerSpawnEgg(TFCEntities.RAT);
+    public static final ItemId LEMMING_EGG = registerSpawnEgg(TFCEntities.LEMMING);
+    public static final ItemId JERBOA_EGG = registerSpawnEgg(TFCEntities.JERBOA);
+    public static final ItemId MONGOOSE_EGG = registerSpawnEgg(TFCEntities.MONGOOSE);
+    public static final ItemId DONKEY_EGG = registerSpawnEgg(TFCEntities.DONKEY);
+    public static final ItemId MULE_EGG = registerSpawnEgg(TFCEntities.MULE);
+    public static final ItemId HORSE_EGG = registerSpawnEgg(TFCEntities.HORSE);
+    public static final ItemId DROMEDARY_CAMEL_EGG = registerSpawnEgg(TFCEntities.DROMEDARY_CAMEL);
+    public static final ItemId BACTRIAN_CAMEL_EGG = registerSpawnEgg(TFCEntities.BACTRIAN_CAMEL);
+    public static final ItemId CAT_EGG = registerSpawnEgg(TFCEntities.CAT);
+    public static final ItemId DOG_EGG = registerSpawnEgg(TFCEntities.DOG);
+    public static final ItemId PANDA_EGG = registerSpawnEgg(TFCEntities.PANDA);
+    public static final ItemId ARMADILLO_EGG = registerSpawnEgg(TFCEntities.ARMADILLO);
+
+    // Pottery
+
+    public static final ItemId UNFIRED_BRICK = register("ceramic/unfired_brick");
+    public static final ItemId UNFIRED_CRUCIBLE = register("ceramic/unfired_crucible");
+    public static final ItemId UNFIRED_FLOWER_POT = register("ceramic/unfired_flower_pot");
+    public static final ItemId UNFIRED_PAN = register("ceramic/unfired_pan");
+    public static final ItemId UNFIRED_BLOWPIPE = register("ceramic/unfired_blowpipe");
+
+    public static final ItemId UNFIRED_BOWL = register("ceramic/unfired_bowl");
+    // Ceramic bowl is registered as a block
+
+    public static final ItemId UNFIRED_FIRE_BRICK = register("ceramic/unfired_fire_brick");
+    public static final ItemId FIRE_BRICK = register("ceramic/fire_brick");
+
+    public static final ItemId UNFIRED_JUG = register("ceramic/unfired_jug");
+    public static final ItemId JUG = register("ceramic/jug", () -> new JugItem(new Properties().stacksTo(1), TFCConfig.SERVER.jugCapacity, TFCTags.Fluids.USABLE_IN_JUG));
+
+    public static final ItemId UNFIRED_POT = register("ceramic/unfired_pot");
+    public static final ItemId POT = register("ceramic/pot");
+
+    public static final ItemId UNFIRED_SPINDLE_HEAD = register("ceramic/unfired_spindle_head");
+    public static final ItemId SPINDLE_HEAD = register("ceramic/spindle_head");
+
+    public static final ItemId UNFIRED_VESSEL = register("ceramic/unfired_vessel");
+    public static final ItemId VESSEL = register("ceramic/vessel", () -> new VesselItem(new Properties()));
+
+    public static final ItemId UNFIRED_CHANNEL = register("ceramic/unfired_channel");
+    public static final ItemId UNFIRED_MOLD_TABLE = register("ceramic/unfired_mold_table");
+
+    public static final Map<DyeColor, ItemId> UNFIRED_GLAZED_VESSELS = Helpers.mapOf(DyeColor.class, color ->
+        register("ceramic/" + color + "_unfired_vessel")
+    );
+
+    public static final Map<DyeColor, ItemId> GLAZED_VESSELS = Helpers.mapOf(DyeColor.class, color ->
+        register("ceramic/" + color + "_glazed_vessel", () -> new VesselItem(new Properties()))
+    );
+
+    public static final Map<Metal.ItemType, ItemId> UNFIRED_MOLDS = Helpers.mapOf(Metal.ItemType.class, Metal.ItemType::hasMold, type ->
+        register("ceramic/unfired_" + type.name() + "_mold")
+    );
+
+    public static final Map<Metal.ItemType, ItemId> MOLDS = Helpers.mapOf(Metal.ItemType.class, Metal.ItemType::hasMold, type ->
+        register("ceramic/" + type.name() + "_mold", () -> new MoldItem(type, new Properties()))
+    );
+
+    public static final ItemId UNFIRED_BELL_MOLD = register("ceramic/unfired_bell_mold");
+    public static final ItemId BELL_MOLD = register("ceramic/bell_mold", () -> new MoldItem(TFCConfig.SERVER.moldBellCapacity, TFCTags.Fluids.USABLE_IN_BELL_MOLD, new Properties()));
+    public static final ItemId UNFIRED_FIRE_INGOT_MOLD = register("ceramic/unfired_fire_ingot_mold");
+    public static final ItemId FIRE_INGOT_MOLD = register("ceramic/fire_ingot_mold", () -> new MoldItem(TFCConfig.SERVER.moldFireIngotCapacity, TFCTags.Fluids.USABLE_IN_INGOT_MOLD, new Properties()));
+
+    public static final ItemId UNFIRED_LARGE_VESSEL = register("ceramic/unfired_large_vessel");
+    public static final Map<DyeColor, ItemId> UNFIRED_GLAZED_LARGE_VESSELS = Helpers.mapOf(DyeColor.class, color ->
+        register("ceramic/unfired_large_vessel/" + color)
+    );
+
+    // Fluid Buckets
+
+    public static final Map<FluidId, ItemId> FLUID_BUCKETS = FluidId.mapOf(fluid ->
+        register("bucket/" + fluid.name(), () -> new BucketItem(fluid.fluid().get(), new Properties().craftRemainder(Items.BUCKET).stacksTo(1)))
+    );
+
+    public static final ItemId RED_STEEL_BUCKET = register("metal/bucket/red_steel", () -> new FluidContainerItem(new Properties(), TFCConfig.SERVER.metalBucketCapacity, TFCTags.Fluids.USABLE_IN_RED_STEEL_BUCKET, true, TFCConfig.SERVER.metalBucketCanPlaceSources));
+    public static final ItemId BLUE_STEEL_BUCKET = register("metal/bucket/blue_steel", () -> new FluidContainerItem(new Properties(), TFCConfig.SERVER.metalBucketCapacity, TFCTags.Fluids.USABLE_IN_BLUE_STEEL_BUCKET, true, TFCConfig.SERVER.metalBucketCanPlaceSources));
+
+    public static final ItemId COD_BUCKET = register("bucket/cod", () -> new MobBucketItem(TFCEntities.COD.get(), TFCFluids.SALT_WATER.getSource(), SoundEvents.BUCKET_EMPTY_FISH, new Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
+    public static final ItemId PUFFERFISH_BUCKET = register("bucket/pufferfish", () -> new MobBucketItem(TFCEntities.PUFFERFISH.get(), TFCFluids.SALT_WATER.getSource(), SoundEvents.BUCKET_EMPTY_FISH, new Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
+    public static final ItemId JELLYFISH_BUCKET = register("bucket/jellyfish", () -> new MobBucketItem(TFCEntities.JELLYFISH.get(), TFCFluids.SALT_WATER.getSource(), SoundEvents.BUCKET_EMPTY_FISH, new Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
+    public static final ItemId TROPICAL_FISH_BUCKET = register("bucket/tropical_fish", () -> new MobBucketItem(TFCEntities.TROPICAL_FISH.get(), TFCFluids.SALT_WATER.getSource(), SoundEvents.BUCKET_EMPTY_FISH, new Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
+
+    public static final Map<Fish, ItemId> FRESHWATER_FISH_BUCKETS = Helpers.mapOf(Fish.class, fish ->
+        register("bucket/" + fish.getSerializedName(), () -> new MobBucketItem(TFCEntities.FRESHWATER_FISH.get(fish).get(), Fluids.WATER, SoundEvents.BUCKET_EMPTY_FISH, new Properties().craftRemainder(Items.BUCKET).stacksTo(1)))
+    );
+
+
+    private static <T extends Mob> ItemId registerSpawnEgg(IdHolder<EntityType<T>> entity)
+    {
+        return register("spawn_egg/" + entity.getId().getPath(), () -> new DeferredSpawnEggItem(entity.holder(), 0xffffff, 0xffffff, new Properties()));
+    }
+
+    private static ItemId register(String name)
+    {
+        return register(name, () -> new Item(new Properties()));
+    }
+
+    private static ItemId register(String name, Properties properties)
+    {
+        return new ItemId(ITEMS.register(name.toLowerCase(Locale.ROOT), () -> new Item(properties)));
+    }
+
+    private static ItemId register(String name, Supplier<Item> item)
+    {
+        return new ItemId(ITEMS.register(name.toLowerCase(Locale.ROOT), item));
+    }
+
+    public record ItemId(DeferredHolder<Item, Item> holder) implements RegistryHolder<Item, Item>, ItemLike
+    {
+        @Override
+        public Item asItem()
+        {
+            return get();
+        }
+    }
+}

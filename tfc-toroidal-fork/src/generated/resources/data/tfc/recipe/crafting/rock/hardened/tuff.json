@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "X": {
+      "item": "tfc:rock/raw/tuff"
+    },
+    "Y": {
+      "item": "tfc:mortar"
+    }
+  },
+  "pattern": [
+    "XYX",
+    "YXY",
+    "XYX"
+  ],
+  "result": {
+    "count": 2,
+    "id": "tfc:rock/hardened/tuff"
+  }
+}

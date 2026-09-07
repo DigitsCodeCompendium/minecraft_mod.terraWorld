@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "X": [
+      {
+        "item": "tfc:glue"
+      },
+      {
+        "item": "minecraft:slime_ball"
+      }
+    ]
+  },
+  "pattern": [
+    "XXX",
+    "XXX",
+    "XXX"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:slime_block"
+  }
+}

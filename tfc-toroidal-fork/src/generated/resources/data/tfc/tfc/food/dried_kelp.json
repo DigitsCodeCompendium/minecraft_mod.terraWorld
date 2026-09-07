@@ -1,0 +1,8 @@
+{
+  "decay_modifier": 2.5,
+  "hunger": 4,
+  "ingredient": {
+    "item": "tfc:food/dried_kelp"
+  },
+  "vegetables": 0.5
+}

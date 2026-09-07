@@ -1,0 +1,8 @@
+{
+  "type": "tfc:chisel",
+  "ingredient": [
+    "tfc:smooth_sandstone/pink"
+  ],
+  "mode": "tfc:smooth",
+  "result": "tfc:cut_sandstone/pink"
+}

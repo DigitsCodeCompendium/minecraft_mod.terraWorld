@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "tag": "c:sheets/copper"
+    },
+    "L": {
+      "item": "tfc:lens"
+    },
+    "M": {
+      "item": "tfc:brass_mechanisms"
+    }
+  },
+  "pattern": [
+    "L",
+    "C",
+    "M"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:spyglass"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": {
+      "item": "tfc:wood/log/douglas_fir"
+    },
+    "L": {
+      "tag": "c:leathers"
+    },
+    "P": {
+      "item": "tfc:wood/planks/douglas_fir"
+    },
+    "S": {
+      "tag": "c:tools/shear"
+    }
+  },
+  "pattern": [
+    " LS",
+    "PPP",
+    "G G"
+  ],
+  "result": {
+    "count": 1,
+    "id": "tfc:wood/sewing_table/douglas_fir"
+  }
+}

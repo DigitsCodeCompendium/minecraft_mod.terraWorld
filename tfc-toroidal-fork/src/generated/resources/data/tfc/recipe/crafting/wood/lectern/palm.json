@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "tfc:wood/bookshelf/palm"
+    },
+    "L": {
+      "item": "tfc:wood/lumber/palm"
+    }
+  },
+  "pattern": [
+    "LLL",
+    " B ",
+    " L "
+  ],
+  "result": {
+    "count": 1,
+    "id": "tfc:wood/lectern/palm"
+  }
+}

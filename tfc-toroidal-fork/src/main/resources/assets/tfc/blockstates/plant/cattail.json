@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "part=upper": {
+      "model": "tfc:block/empty"
+    },
+    "part=lower": {
+      "model": "tfc:block/plant/cattail_dynamic"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "values": [
+    "#tfc:land_predators",
+    "#tfc:water_ambient",
+    "#tfc:water_creatures",
+    "#tfc:pests",
+    "#tfc:pets",
+    "#tfc:ramming_animals",
+    "#tfc:water_creatures",
+    "#tfc:farm_animals",
+    "#tfc:wild_prey_animals",
+    "tfc:rabbit"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "type": "tfc:chisel",
+  "ingredient": [
+    "tfc:rock/raw/tuff",
+    "tfc:rock/hardened/tuff"
+  ],
+  "mode": "tfc:smooth",
+  "result": "tfc:rock/smooth/tuff"
+}

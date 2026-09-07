@@ -1,0 +1,8 @@
+{
+  "type": "tfc:chisel",
+  "ingredient": [
+    "tfc:wood/planks/blackwood"
+  ],
+  "mode": "tfc:stair",
+  "result": "tfc:wood/planks/blackwood_stairs"
+}

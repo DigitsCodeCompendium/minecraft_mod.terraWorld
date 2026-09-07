@@ -1,0 +1,47 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "E": {
+      "type": "tfc:and",
+      "children": [
+        {
+          "item": "minecraft:egg"
+        },
+        {
+          "type": "tfc:not_rotten"
+        }
+      ]
+    },
+    "F": {
+      "type": "tfc:and",
+      "children": [
+        {
+          "tag": "c:foods/flour"
+        },
+        {
+          "type": "tfc:not_rotten"
+        }
+      ]
+    },
+    "M": {
+      "type": "tfc:fluid_content",
+      "fluid": {
+        "amount": 100,
+        "fluid": "minecraft:water"
+      }
+    },
+    "S": {
+      "tag": "tfc:foods/sweeteners"
+    }
+  },
+  "pattern": [
+    " M ",
+    "SES",
+    "FFF"
+  ],
+  "result": {
+    "count": 1,
+    "id": "tfc:cake"
+  }
+}

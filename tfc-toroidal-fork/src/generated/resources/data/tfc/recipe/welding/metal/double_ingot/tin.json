@@ -1,0 +1,14 @@
+{
+  "type": "tfc:welding",
+  "first_input": {
+    "tag": "c:ingots/tin"
+  },
+  "result": {
+    "count": 1,
+    "id": "tfc:metal/double_ingot/tin"
+  },
+  "second_input": {
+    "tag": "c:ingots/tin"
+  },
+  "tier": -1
+}

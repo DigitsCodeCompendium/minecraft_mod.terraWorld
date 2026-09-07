@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "H": {
+      "tag": "tfc:high_quality_cloth"
+    },
+    "L": {
+      "tag": "tfc:lumber"
+    }
+  },
+  "pattern": [
+    "HHH",
+    "LLL"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:white_bed"
+  }
+}

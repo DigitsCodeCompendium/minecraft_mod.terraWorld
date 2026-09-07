@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.terraskills.toroidalcompat.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "BiomeNoiseSamplerMixin",
+    "ChunkHeightFillerMixin",
+    "MutableDensityFunctionContextMixin",
+    "RegionBiomeSourceMixin",
+    "RegionChunkDataGeneratorMixin",
+    "RegionGeneratorMixin",
+    "ShapedDimensionsMixin",
+    "TFCChunkGeneratorAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

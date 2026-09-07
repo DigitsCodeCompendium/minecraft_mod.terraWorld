@@ -1,0 +1,11 @@
+{
+  "values": [
+    "#tfc:dairy_animals",
+    "#tfc:oviparous_animals",
+    "#tfc:shearable_animals",
+    "#tfc:rideable_animals",
+    "tfc:pig",
+    "tfc:rabbit",
+    "tfc:frog"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "values": [
+    "tfc:cod",
+    "tfc:pufferfish",
+    "tfc:tropical_fish",
+    "tfc:salmon",
+    "tfc:rainbow_trout",
+    "tfc:lake_trout",
+    "tfc:bluegill",
+    "tfc:largemouth_bass",
+    "tfc:smallmouth_bass",
+    "tfc:crappie",
+    "tfc:arctic_char",
+    "tfc:burbot",
+    "tfc:peacock_bass",
+    "tfc:pacu",
+    "tfc:red_piranha",
+    "tfc:northern_pike",
+    "tfc:muksun",
+    "tfc:tilapia",
+    "tfc:spotted_gudgeon"
+  ]
+}

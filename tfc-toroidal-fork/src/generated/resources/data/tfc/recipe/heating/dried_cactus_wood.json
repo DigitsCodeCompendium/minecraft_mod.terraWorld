@@ -1,0 +1,11 @@
+{
+  "type": "tfc:heating",
+  "ingredient": {
+    "item": "tfc:cactus_wood"
+  },
+  "result_item": {
+    "count": 1,
+    "id": "tfc:dried_cactus_wood"
+  },
+  "temperature": 700.0
+}

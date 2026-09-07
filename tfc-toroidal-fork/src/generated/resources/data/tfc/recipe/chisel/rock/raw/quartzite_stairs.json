@@ -1,0 +1,8 @@
+{
+  "type": "tfc:chisel",
+  "ingredient": [
+    "tfc:rock/raw/quartzite"
+  ],
+  "mode": "tfc:stair",
+  "result": "tfc:rock/raw/quartzite_stairs"
+}

@@ -1,0 +1,8 @@
+{
+  "decay_modifier": 2.5,
+  "grain": 0.5,
+  "hunger": 4,
+  "ingredient": {
+    "item": "tfc:food/taro_root"
+  }
+}

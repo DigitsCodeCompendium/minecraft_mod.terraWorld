@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "part=lower": {
+      "model": "tfc:block/plant/sapphire_tower_lower_dynamic"
+    },
+    "part=upper": {
+      "model": "tfc:block/plant/sapphire_tower_upper_dynamic"
+    }
+  }
+}

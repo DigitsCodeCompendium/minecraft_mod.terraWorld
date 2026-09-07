@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "L": {
+      "item": "tfc:wood/lumber/white_cedar"
+    },
+    "S": {
+      "tag": "c:rods/wooden"
+    }
+  },
+  "pattern": [
+    "  S",
+    " SL",
+    "SLL"
+  ],
+  "result": {
+    "count": 1,
+    "id": "tfc:wood/sluice/white_cedar"
+  }
+}

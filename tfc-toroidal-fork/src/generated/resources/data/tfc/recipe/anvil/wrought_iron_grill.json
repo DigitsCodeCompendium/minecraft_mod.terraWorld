@@ -1,0 +1,16 @@
+{
+  "type": "tfc:anvil",
+  "ingredient": {
+    "tag": "c:double_sheets/wrought_iron"
+  },
+  "result": {
+    "count": 1,
+    "id": "tfc:wrought_iron_grill"
+  },
+  "rules": [
+    "punch_last",
+    "draw_any",
+    "punch_not_last"
+  ],
+  "tier": 3
+}

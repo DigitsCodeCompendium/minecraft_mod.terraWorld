@@ -1,0 +1,8 @@
+{
+  "type": "tfc:chisel",
+  "ingredient": [
+    "tfc:rock/raw/chert"
+  ],
+  "mode": "tfc:stair",
+  "result": "tfc:rock/raw/chert_stairs"
+}

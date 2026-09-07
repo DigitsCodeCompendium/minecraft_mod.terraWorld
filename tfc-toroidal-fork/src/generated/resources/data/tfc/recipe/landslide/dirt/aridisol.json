@@ -1,0 +1,12 @@
+{
+  "type": "tfc:landslide",
+  "ingredient": [
+    "tfc:dirt/aridisol",
+    "tfc:grass/aridisol",
+    "tfc:duff/aridisol",
+    "tfc:grass_path/aridisol",
+    "tfc:farmland/aridisol",
+    "tfc:rooted_dirt/aridisol"
+  ],
+  "result": "tfc:dirt/aridisol"
+}

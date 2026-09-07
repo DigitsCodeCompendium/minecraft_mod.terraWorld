@@ -1,0 +1,12 @@
+{
+  "values": [
+    "tfc:coarse_dirt/entisol",
+    "tfc:coarse_dirt/aridisol",
+    "tfc:coarse_dirt/oxisol",
+    "tfc:coarse_dirt/fluvisol",
+    "tfc:coarse_dirt/andisol",
+    "tfc:coarse_dirt/podzol",
+    "tfc:coarse_dirt/alfisol",
+    "tfc:coarse_dirt/mollisol"
+  ]
+}

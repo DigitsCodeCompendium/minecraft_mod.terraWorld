@@ -1,0 +1,8 @@
+{
+  "values": [
+    "tfc:metal/block/brass",
+    "tfc:metal/exposed_block/brass",
+    "tfc:metal/weathered_block/brass",
+    "tfc:metal/oxidized_block/brass"
+  ]
+}

@@ -1,0 +1,154 @@
+/*
+ * Licensed under the EUPL, Version 1.2.
+ * You may obtain a copy of the Licence at:
+ * https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+ */
+
+package net.dries007.tfc.common.blocks.devices;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.BlockHitResult;
+
+import net.dries007.tfc.common.TFCTags;
+import net.dries007.tfc.common.blockentities.BlastFurnaceBlockEntity;
+import net.dries007.tfc.common.blockentities.TFCBlockEntities;
+import net.dries007.tfc.common.blocks.ExtendedProperties;
+import net.dries007.tfc.common.blocks.TFCBlocks;
+import net.dries007.tfc.config.TFCConfig;
+import net.dries007.tfc.util.Helpers;
+import net.dries007.tfc.util.MultiBlock;
+
+public class BlastFurnaceBlock extends DeviceBlock implements IBellowsConsumer
+{
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
+
+    private static final MultiBlock BLAST_FURNACE_CHIMNEY;
+
+    static
+    {
+        BLAST_FURNACE_CHIMNEY = new MultiBlock()
+            .match(new BlockPos(0, 0, 0), state -> state.isAir() || Helpers.isBlock(state, TFCBlocks.MOLTEN.get()))
+            .match(new BlockPos(0, 0, 1), TFCTags.Blocks.BLAST_FURNACE_INSULATION)
+            .match(new BlockPos(0, 0, -1), TFCTags.Blocks.BLAST_FURNACE_INSULATION)
+            .match(new BlockPos(1, 0, 0), TFCTags.Blocks.BLAST_FURNACE_INSULATION)
+            .match(new BlockPos(-1, 0, 0), TFCTags.Blocks.BLAST_FURNACE_INSULATION)
+            .match(new BlockPos(1, 0, 1), TFCTags.Blocks.BLAST_FURNACE_INSULATION)
+            .match(new BlockPos(1, 0, -1), TFCTags.Blocks.BLAST_FURNACE_INSULATION)
+            .match(new BlockPos(-1, 0, -1), TFCTags.Blocks.BLAST_FURNACE_INSULATION)
+            .match(new BlockPos(-1, 0, 1), TFCTags.Blocks.BLAST_FURNACE_INSULATION);
+    }
+
+    public static boolean isBlastFurnaceInsulationBlock(BlockState state)
+    {
+        return Helpers.isBlock(state, TFCTags.Blocks.BLAST_FURNACE_INSULATION);
+    }
+
+    /**
+     * @param pos The position of the blast furnace.
+     * @return The number of layers of chimney present in the blast furnace, in the range [0, 4].
+     */
+    public static int getChimneyLevels(Level level, BlockPos pos)
+    {
+        final int maxHeight = TFCConfig.SERVER.blastFurnaceMaxChimneyHeight.get();
+        for (int i = 0; i < maxHeight; i++)
+        {
+            final BlockPos center = pos.above(i + 1);
+            if (!BLAST_FURNACE_CHIMNEY.test(level, center))
+            {
+                return i;
+            }
+        }
+        return maxHeight;
+    }
+
+    public BlastFurnaceBlock(ExtendedProperties properties)
+    {
+        super(properties, InventoryRemoveBehavior.DROP);
+
+        registerDefaultState(getStateDefinition().any().setValue(LIT, false));
+    }
+
+    @Override
+    protected boolean hasAnalogOutputSignal(BlockState state)
+    {
+        return TFCConfig.SERVER.blastFurnaceEnableAutomation.get();
+    }
+
+    @Override
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos)
+    {
+        if (level.getBlockEntity(pos) instanceof BlastFurnaceBlockEntity blastFurnace)
+        {
+            if (blastFurnace.getFuelCount() > 0 && blastFurnace.getCapacity() != 0)
+            {
+                return Mth.clamp(blastFurnace.getFuelCount() * 15 / blastFurnace.getCapacity(), 1, 15);
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult)
+    {
+        final BlastFurnaceBlockEntity blastFurnace = level.getBlockEntity(pos, TFCBlockEntities.BLAST_FURNACE.get()).orElse(null);
+        if (blastFurnace != null)
+        {
+            if (player instanceof ServerPlayer serverPlayer)
+            {
+                serverPlayer.openMenu(blastFurnace, pos);
+            }
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        }
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+    }
+
+    @Override
+    public boolean canAcceptAir(Level level, BlockPos pos, BlockState state)
+    {
+        return level.getBlockEntity(pos, TFCBlockEntities.BLAST_FURNACE.get())
+            .map(BlastFurnaceBlockEntity::hasTuyere)
+            .orElse(false);
+    }
+
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random)
+    {
+        if (!state.getValue(LIT)) return;
+        final double x = pos.getX();
+        final double y = pos.getY();
+        final double z = pos.getZ();
+        if (random.nextDouble() < 0.1)
+        {
+            level.playLocalSound(x, y, z, SoundEvents.BLASTFURNACE_FIRE_CRACKLE, SoundSource.BLOCKS, 0.5F + random.nextFloat(), random.nextFloat() * 0.7F + 0.6F, false);
+        }
+        level.addParticle(ParticleTypes.SMALL_FLAME, x + random.nextFloat(), y + random.nextFloat(), z + random.nextFloat(), 0, 0, 0);
+    }
+
+    @Override
+    public void intakeAir(Level level, BlockPos pos, BlockState state, int amount)
+    {
+        level.getBlockEntity(pos, TFCBlockEntities.BLAST_FURNACE.get()).ifPresent(blastFurnace -> blastFurnace.intakeAir(amount));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
+    {
+        super.createBlockStateDefinition(builder.add(LIT));
+    }
+}
