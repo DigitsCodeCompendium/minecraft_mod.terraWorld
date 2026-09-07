@@ -110,7 +110,7 @@ public final class ClientHelpers
         if (level != null && player != null)
         {
             final BlockPos pos = player.blockPosition();
-            return SolarCalculator.getInNorthernHemisphere(pos.getZ(), ClimateRenderCache.INSTANCE.getHemisphereScale());
+            return SolarCalculator.getInNorthernHemisphere(pos.getZ() + ClimateRenderCache.INSTANCE.getHemisphereOffset(), ClimateRenderCache.INSTANCE.getHemisphereScale(), ClimateRenderCache.INSTANCE.mirrorsSouthernHemisphere());
         }
         // If null, default to true
         return true;

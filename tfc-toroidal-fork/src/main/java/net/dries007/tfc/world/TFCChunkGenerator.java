@@ -163,6 +163,18 @@ public class TFCChunkGenerator extends ChunkGenerator implements ChunkGeneratorE
     }
 
     @Override
+    public int climateTemperatureOffset()
+    {
+        return topology.climateZOffsetBlocks(settings.temperatureScale());
+    }
+
+    @Override
+    public boolean climateMirrorsSouthernHemisphere()
+    {
+        return topology.mirrorsSouthernHemisphere();
+    }
+
+    @Override
     public void applySettings(UnaryOperator<Settings> settings)
     {
         this.settings = settings.apply(this.settings);

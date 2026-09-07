@@ -29,6 +29,9 @@ dependencies {
     implementation "maven.modrinth:toroidal-world:${toroidal_world_version}"
     localRuntime "maven.modrinth:tfc-mantle-mountains:${tfc_mantle_mountains_version}"
     localRuntime "vazkii.patchouli:Patchouli:${patchouli_version}"
+    // Toroidal World owns the JourneyMap API plugin and mixins. Keep JourneyMap
+    // runtime-only so players can still use this compatibility mod without it.
+    localRuntime "maven.modrinth:journeymap:${journeymap_version}"
 
     testImplementation platform('org.junit:junit-bom:5.11.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'

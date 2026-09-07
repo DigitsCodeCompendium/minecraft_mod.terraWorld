@@ -3,13 +3,10 @@ package com.terraskills.toroidalcompat.client;
 import com.terraskills.toroidalcompat.config.ToroidalCompatClientConfig;
 import com.toroidalworld.api.ToroidalShape;
 import com.toroidalworld.api.ToroidalWorldApi;
-import net.dries007.tfc.client.overworld.SolarCalculator;
-import net.dries007.tfc.util.climate.Climate;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 
 import java.util.Locale;
@@ -42,25 +39,23 @@ public final class ToroidalStatusHud {
                 Component.literal("Location").withStyle(ChatFormatting.GOLD), 6, 5, 0xFFFFFFFF, true);
 
         final ToroidalShape shape = optionalShape.orElseThrow();
-        final double foldedX = shape.loops(Direction.Axis.X)
-                ? shape.foldCoord(Direction.Axis.X, minecraft.player.getX()) : minecraft.player.getX();
-        final int foldedZ = (int) Math.floor(shape.loops(Direction.Axis.Z)
-                ? shape.foldCoord(Direction.Axis.Z, minecraft.player.getZ()) : minecraft.player.getZ());
-        final double latitude = SolarCalculator.getLatitude(foldedZ,
-                Climate.get(minecraft.level).hemisphereScale()) * 180.0 / Math.PI;
-        final double longitude = shape.loops(Direction.Axis.X)
-                ? (foldedX - shape.minBlock(Direction.Axis.X)) / shape.widthBlocks(Direction.Axis.X) * 360.0 - 180.0
-                : foldedX;
-        graphics.drawString(minecraft.font, "Latitude   " + angular(latitude, "N", "S"),
+        final double latitude = ToroidalAngles.latitude(shape, minecraft.player.getZ());
+        final double longitude = ToroidalAngles.longitude(shape, minecraft.player.getX());
+        graphics.drawString(minecraft.font, "Latitude   " + signedAngle(latitude),
                 6, 17, 0xFFE7E7E7, true);
-        graphics.drawString(minecraft.font, "Longitude  " + angular(longitude, "E", "W"),
+        graphics.drawString(minecraft.font, "Longitude  " + unsignedAngle(longitude),
                 6, 29, 0xFFE7E7E7, true);
         graphics.pose().popPose();
     }
 
-    private static String angular(double value, String positive, String negative) {
-        final String direction = value < 0 ? negative : positive;
-        return String.format(Locale.ROOT, "%.2f\u00B0%s", Math.abs(value), direction);
+    private static String signedAngle(double value) {
+        return Math.abs(value) < 0.005
+                ? "0.00\u00B0"
+                : String.format(Locale.ROOT, "%+.2f\u00B0", value);
+    }
+
+    private static String unsignedAngle(double value) {
+        return String.format(Locale.ROOT, "%.2f\u00B0", value);
     }
 
     private static void drawPanel(GuiGraphics graphics) {

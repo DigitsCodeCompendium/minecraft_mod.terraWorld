@@ -43,13 +43,14 @@ public final class RegionGenerator
         return Math.abs(4f * frequency * value + 1f - 4f * Mth.floor(frequency * value + 0.75f)) - 1f;
     }
 
-    private static Noise2D baseNoise(boolean axisIsX, float scale, float constant)
+    private static Noise2D baseNoise(boolean axisIsX, float scale, float constant, float zOffsetBlocks)
     {
         final float frequency = Units.GRID_WIDTH_IN_BLOCK / (2f * scale);
+        final float zOffset = zOffsetBlocks / Units.GRID_WIDTH_IN_BLOCK;
         return scale == 0 ?
             (x, z) -> constant : axisIsX ?
             (x, z) -> triangle(frequency, x) :
-            (x, z) -> triangle(frequency, z);
+            (x, z) -> triangle(frequency, z + zOffset);
     }
 
     public final Cellular2D cellNoise;
@@ -99,7 +100,7 @@ public final class RegionGenerator
                 .scaled(min, 8.7f)
                 .octaves(4)));
 
-        this.temperatureNoise = periodic(baseNoise(false, topology.climateScaleBlocks(false, settings.temperatureScale()), settings.temperatureConstant())
+        this.temperatureNoise = periodic(baseNoise(false, topology.climateScaleBlocks(false, settings.temperatureScale()), settings.temperatureConstant(), topology.climateZOffsetBlocks(settings.temperatureScale()))
             .scaled(-20f, 30f)
             .add(new OpenSimplex2D(seed.next())
                 .octaves(2)
@@ -108,7 +109,7 @@ public final class RegionGenerator
 
         this.oceanicInfluenceNoise = periodic(new OpenSimplex2D(seed.next()).spread(0.02f));
 
-        this.rainfallNoise = periodic(baseNoise(true, topology.climateScaleBlocks(true, settings.rainfallScale()), settings.rainfallConstant())
+        this.rainfallNoise = periodic(baseNoise(true, topology.climateScaleBlocks(true, settings.rainfallScale()), settings.rainfallConstant(), 0)
             .scaled(0f, 500f)
             .add(new OpenSimplex2D(seed.next())
                 .octaves(2)

@@ -6,11 +6,15 @@
   "mixins": [
     "BiomeNoiseSamplerMixin",
     "ChunkHeightFillerMixin",
+    "IceSheetShieldVolcanoSurfaceBuilderMixin",
+    "IceSheetSurfaceBuilderMixin",
     "MutableDensityFunctionContextMixin",
     "RegionBiomeSourceMixin",
     "RegionChunkDataGeneratorMixin",
     "RegionGeneratorMixin",
     "ShapedDimensionsMixin",
+    "ShoreAndOceanSurfaceBuilderMixin",
+    "ShoreSurfaceStateMixin",
     "TFCChunkGeneratorAccessor"
   ],
   "injectors": {

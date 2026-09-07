@@ -38,10 +38,11 @@ public final class ClientSolarCalculatorBridge
                 return Calendars.CLIENT.getTotalCalendarDays() * ICalendar.CALENDAR_TICKS_IN_DAY
                     - TFCConfig.COMMON.defaultCalendarStartDay.get() * ICalendar.CALENDAR_TICKS_IN_DAY
                     + SolarCalculator.getSunBasedDayTime(
-                    player.blockPosition().getZ(),
+                    player.blockPosition().getZ() + Climate.get(level).hemisphereOffset(),
                     Climate.get(level).hemisphereScale(),
                     Calendars.CLIENT.getCalendarFractionOfYear(),
-                    Calendars.CLIENT.getCalendarFractionOfDay());
+                    Calendars.CLIENT.getCalendarFractionOfDay(),
+                    Climate.get(level).mirrorsSouthernHemisphere());
             }
         }
         return maybeLevel.getLevelData().getDayTime(); // Fallback
@@ -50,10 +51,11 @@ public final class ClientSolarCalculatorBridge
     public static SkyPos getSunPosition(Level level, BlockPos pos)
     {
         return SolarCalculator.getSunPosition(
-            pos.getZ(),
+            pos.getZ() + Climate.get(level).hemisphereOffset(),
             Climate.get(level).hemisphereScale(),
             Calendars.CLIENT.getCalendarFractionOfYear(),
-            Calendars.CLIENT.getCalendarFractionOfDay());
+            Calendars.CLIENT.getCalendarFractionOfDay(),
+            Climate.get(level).mirrorsSouthernHemisphere());
     }
 
     public static int getMoonPhase()
@@ -64,10 +66,11 @@ public final class ClientSolarCalculatorBridge
     public static SkyPos getMoonPosition(Level level, BlockPos pos)
     {
         return SolarCalculator.getMoonPosition(
-            pos.getZ(),
+            pos.getZ() + Climate.get(level).hemisphereOffset(),
             Climate.get(level).hemisphereScale(),
             Calendars.CLIENT.getCalendarTicks(),
-            getMoonOrbitTicks());
+            getMoonOrbitTicks(),
+            Climate.get(level).mirrorsSouthernHemisphere());
     }
 
     public static int getMoonOrbitTicks()
@@ -78,9 +81,10 @@ public final class ClientSolarCalculatorBridge
     public static SkyPos getStarPosition(Level level, BlockPos pos)
     {
         return SolarCalculator.getStarPosition(
-            pos.getZ(),
+            pos.getZ() + Climate.get(level).hemisphereOffset(),
             Climate.get(level).hemisphereScale(),
             Calendars.CLIENT.getCalendarFractionOfDay(),
-            Calendars.CLIENT.getCalendarFractionOfYear());
+            Calendars.CLIENT.getCalendarFractionOfYear(),
+            Climate.get(level).mirrorsSouthernHemisphere());
     }
 }

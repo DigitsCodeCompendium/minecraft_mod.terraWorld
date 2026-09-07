@@ -2,9 +2,7 @@ package com.terraskills.toroidalcompat;
 
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
-import com.terraskills.toroidalcompat.debug.WrapDebugOverlay;
-import com.terraskills.toroidalcompat.debug.ClientClimateCrossingTrace;
-import com.terraskills.toroidalcompat.config.ToroidalCompatConfig;
+import com.terraskills.toroidalcompat.client.ClientClimateTopology;
 import com.terraskills.toroidalcompat.config.ToroidalCompatClientConfig;
 import com.terraskills.toroidalcompat.client.ToroidalCompatClient;
 import com.terraskills.toroidalcompat.worldgen.ToroidalTFCChunkGenerator;
@@ -42,14 +40,12 @@ public final class TfcToroidalCompat {
     }
 
     public TfcToroidalCompat(IEventBus modBus, ModContainer container) {
-        container.registerConfig(ModConfig.Type.COMMON, ToroidalCompatConfig.SPEC);
         CHUNK_GENERATORS.register(modBus);
         NeoForge.EVENT_BUS.register(this);
-        NeoForge.EVENT_BUS.register(new WrapDebugOverlay());
         if (FMLEnvironment.dist == Dist.CLIENT) {
             container.registerConfig(ModConfig.Type.CLIENT, ToroidalCompatClientConfig.SPEC);
             ToroidalCompatClient.register(modBus, container);
-            ClientClimateCrossingTrace.init();
+            ClientClimateTopology.init();
         }
     }
 

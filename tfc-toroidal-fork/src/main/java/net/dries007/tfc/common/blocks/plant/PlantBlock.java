@@ -254,7 +254,7 @@ public abstract class PlantBlock extends TFCBushBlock implements ISlowEntities
 
         if (random.nextInt(200) == 0 && Helpers.isBlock(state, BlockTags.FLOWERS) && !level.isRaining())
         {
-            final int dayTime = SolarCalculator.getSunBasedDayTime(pos.getZ(), ClimateRenderCache.INSTANCE.getHemisphereScale(), Calendars.CLIENT.getCalendarFractionOfYear(), Calendars.CLIENT.getCalendarFractionOfDay());
+            final int dayTime = SolarCalculator.getSunBasedDayTime(pos.getZ() + ClimateRenderCache.INSTANCE.getHemisphereOffset(), ClimateRenderCache.INSTANCE.getHemisphereScale(), Calendars.CLIENT.getCalendarFractionOfYear(), Calendars.CLIENT.getCalendarFractionOfDay(), ClimateRenderCache.INSTANCE.mirrorsSouthernHemisphere());
             if (dayTime < 12_000)
             {
                 // During the day, spawn butterflies

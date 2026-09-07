@@ -63,7 +63,12 @@ public final class SolarCalculator
      */
     public static int getSunBasedDayTime(int z, float hemisphereScale, float fractionOfYear, float fractionOfDay)
     {
-        final float zenith = getSunPosition(z, hemisphereScale, fractionOfYear, fractionOfDay).zenith();
+        return getSunBasedDayTime(z, hemisphereScale, fractionOfYear, fractionOfDay, false);
+    }
+
+    public static int getSunBasedDayTime(int z, float hemisphereScale, float fractionOfYear, float fractionOfDay, boolean mirrorSouthernHemisphere)
+    {
+        final float zenith = getSunPosition(z, hemisphereScale, fractionOfYear, fractionOfDay, mirrorSouthernHemisphere).zenith();
         if (fractionOfDay < 0.5)
         {
             // Midnight -> Noon
@@ -72,13 +77,13 @@ public final class SolarCalculator
             if (zenith > Mth.HALF_PI)
             {
                 // Midnight -> Sunrise
-                final float minZenith = getSunPosition(z, hemisphereScale, fractionOfYear, 0f).zenith();
+                final float minZenith = getSunPosition(z, hemisphereScale, fractionOfYear, 0f, mirrorSouthernHemisphere).zenith();
                 return (int) Mth.clampedMap(zenith, minZenith, Mth.HALF_PI, 18_000, 24_000);
             }
             else
             {
                 // Sunrise -> Noon
-                final float maxZenith = getSunPosition(z, hemisphereScale, fractionOfYear, 0.5f).zenith();
+                final float maxZenith = getSunPosition(z, hemisphereScale, fractionOfYear, 0.5f, mirrorSouthernHemisphere).zenith();
                 return (int) Mth.clampedMap(zenith, Mth.HALF_PI, maxZenith, 0, 6_000);
             }
         }
@@ -90,13 +95,13 @@ public final class SolarCalculator
             if (zenith < Mth.HALF_PI)
             {
                 // Noon -> Sunset
-                final float maxZenith = getSunPosition(z, hemisphereScale, fractionOfYear, 0.5f).zenith();
+                final float maxZenith = getSunPosition(z, hemisphereScale, fractionOfYear, 0.5f, mirrorSouthernHemisphere).zenith();
                 return (int) Mth.clampedMap(zenith, maxZenith, Mth.HALF_PI, 6_000, 12_000);
             }
             else
             {
                 // Sunset -> Midnight
-                final float minZenith = getSunPosition(z, hemisphereScale, fractionOfYear, 1f).zenith();
+                final float minZenith = getSunPosition(z, hemisphereScale, fractionOfYear, 1f, mirrorSouthernHemisphere).zenith();
                 return (int) Mth.clampedMap(zenith, Mth.HALF_PI, minZenith, 12_000, 18_000);
             }
         }
@@ -115,7 +120,12 @@ public final class SolarCalculator
      */
     public static SkyPos getSunPosition(int z, float hemisphereScale, float fractionOfYear, float fractionOfDay)
     {
-        final double latitude = getLatitude(z, hemisphereScale);
+        return getSunPosition(z, hemisphereScale, fractionOfYear, fractionOfDay, false);
+    }
+
+    public static SkyPos getSunPosition(int z, float hemisphereScale, float fractionOfYear, float fractionOfDay, boolean mirrorSouthernHemisphere)
+    {
+        final double latitude = getLatitude(z, hemisphereScale, mirrorSouthernHemisphere);
         // Declination
         // Approximation based on sin with amplitude of 23.44 degrees
         final double declination = 23.44f * Mth.DEG_TO_RAD * Mth.sin(Mth.TWO_PI * (284f / 365f + fractionOfYear));
@@ -164,12 +174,19 @@ public final class SolarCalculator
         return Helpers.triangle(-Mth.HALF_PI, 0, 1 / (4 * hemisphereScale), z - 0.5f * hemisphereScale);
     }
 
+    public static float getLatitude(int z, float hemisphereScale, boolean mirrorSouthernHemisphere)
+    {
+        final float latitude = getLatitude(z, hemisphereScale);
+        return mirrorSouthernHemisphere ? Math.abs(latitude) : latitude;
+    }
+
     /**
      * Return true if the position is in a Northern Hemisphere, false if Southern
      */
     public static boolean getInNorthernHemisphere(BlockPos pos, Level level)
     {
-        return getInNorthernHemisphere(pos.getZ(), Climate.get(level).hemisphereScale());
+        final var climate = Climate.get(level);
+        return getInNorthernHemisphere(pos.getZ() + climate.hemisphereOffset(), climate.hemisphereScale(), climate.mirrorsSouthernHemisphere());
     }
 
     /**
@@ -185,6 +202,11 @@ public final class SolarCalculator
         final int poleToPoleDistance = (int) (hemisphereScale * 2);
         final int normalizedZ = Mth.positiveModulo(adjustedZ, (poleToPoleDistance * 2));
         return normalizedZ > poleToPoleDistance;
+    }
+
+    public static boolean getInNorthernHemisphere(int z, float hemisphereScale, boolean mirrorSouthernHemisphere)
+    {
+        return mirrorSouthernHemisphere || getInNorthernHemisphere(z, hemisphereScale);
     }
 
     /**
@@ -204,6 +226,11 @@ public final class SolarCalculator
 
     public static SkyPos getMoonPosition(int z, float hemisphereScale, long calendarTick, long lunarOrbitTicks)
     {
+        return getMoonPosition(z, hemisphereScale, calendarTick, lunarOrbitTicks, false);
+    }
+
+    public static SkyPos getMoonPosition(int z, float hemisphereScale, long calendarTick, long lunarOrbitTicks, boolean mirrorSouthernHemisphere)
+    {
         // Lunar orbit is calculated with a constant orbit, at an inclination of <earth axial tilt> + <lunar axial tilt>
         // We also incorporate slight procession (so the inclination of the orbit moves over time, out of sync with the orbital phase)
         final double lunarAzimuth = Mth.TWO_PI * (float) (calendarTick % lunarOrbitTicks) / lunarOrbitTicks;
@@ -211,7 +238,7 @@ public final class SolarCalculator
 
         // The observer is the position on earth that we would be observing the moon from. We use this to rotate the location of the moon (initially
         // given in earth-centric coordinates), into coordinates based on the observer position.
-        final double observerZenith = Mth.HALF_PI - getLatitude(z, hemisphereScale);
+        final double observerZenith = Mth.HALF_PI - getLatitude(z, hemisphereScale, mirrorSouthernHemisphere);
         final double observerAzimuth = Mth.TWO_PI * (1 - ICalendar.getFractionOfDay(calendarTick));
 
         // Rotation Rz(-observerAzimuth) are trivial to do in spherical coordinates
@@ -246,10 +273,15 @@ public final class SolarCalculator
      */
     public static SkyPos getStarPosition(int z, float hemisphereScale, float fractionOfDay, float fractionOfYear)
     {
+        return getStarPosition(z, hemisphereScale, fractionOfDay, fractionOfYear, false);
+    }
+
+    public static SkyPos getStarPosition(int z, float hemisphereScale, float fractionOfDay, float fractionOfYear, boolean mirrorSouthernHemisphere)
+    {
         // The zenith position is just based on the latitude, not inverted
         // The azimuth position is based on both the rotation of the earth, and the rotation of earth around the sun - different stars will be seen
         // on opposite years, during day and night.
-        final double starZenith = Mth.HALF_PI - getLatitude(z, hemisphereScale);
+        final double starZenith = Mth.HALF_PI - getLatitude(z, hemisphereScale, mirrorSouthernHemisphere);
         final double starAzimuth = Mth.TWO_PI * Mth.frac(fractionOfYear + fractionOfDay + 0.5f);
         return SkyPos.of(starZenith, starAzimuth);
     }

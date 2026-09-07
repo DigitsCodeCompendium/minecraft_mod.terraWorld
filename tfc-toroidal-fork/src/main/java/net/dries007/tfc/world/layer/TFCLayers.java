@@ -13,12 +13,14 @@ import net.dries007.tfc.util.IArtist;
 import net.dries007.tfc.world.Seed;
 import net.dries007.tfc.world.biome.BiomeExtension;
 import net.dries007.tfc.world.biome.TFCBiomes;
+import net.dries007.tfc.world.layer.framework.Area;
 import net.dries007.tfc.world.layer.framework.AreaFactory;
 import net.dries007.tfc.world.layer.framework.TypedAreaFactory;
 import net.dries007.tfc.world.noise.OpenSimplex2D;
 import net.dries007.tfc.world.region.Region;
 import net.dries007.tfc.world.region.RegionGenerator;
 import net.dries007.tfc.world.region.Units;
+import net.dries007.tfc.world.region.WorldTopology;
 
 public class TFCLayers
 {
@@ -170,34 +172,56 @@ public class TFCLayers
 
     public static AreaFactory createOverworldForestLayer(long seed, IArtist<AreaFactory> artist)
     {
+        return createOverworldForestLayer(seed, artist, WorldTopology.PLANAR);
+    }
+
+    public static AreaFactory createOverworldForestLayer(long seed, IArtist<AreaFactory> artist, WorldTopology topology)
+    {
         final Random random = new Random(seed);
 
         AreaFactory layer;
 
-        layer = new ForestInitLayer(new OpenSimplex2D(random.nextInt()).spread(0.25f)).apply(random.nextLong());
+        layer = periodicForestLayer(new ForestInitLayer(new OpenSimplex2D(random.nextInt()).spread(0.25f)).apply(random.nextLong()), topology, 5);
         artist.draw("forest", 1, layer);
-        layer = ForestRandomizeLayer.INSTANCE.apply(random.nextLong(), layer);
+        layer = periodicForestLayer(ForestRandomizeLayer.INSTANCE.apply(random.nextLong(), layer), topology, 5);
         artist.draw("forest", 2, layer);
-        layer = ZoomLayer.FUZZY.apply(random.nextLong(), layer);
+        layer = periodicForestLayer(ZoomLayer.FUZZY.apply(random.nextLong(), layer), topology, 4);
         artist.draw("forest", 3, layer);
-        layer = ForestRandomizeLayer.INSTANCE.apply(random.nextLong(), layer);
+        layer = periodicForestLayer(ForestRandomizeLayer.INSTANCE.apply(random.nextLong(), layer), topology, 4);
         artist.draw("forest", 4, layer);
-        layer = ZoomLayer.FUZZY.apply(random.nextLong(), layer);
+        layer = periodicForestLayer(ZoomLayer.FUZZY.apply(random.nextLong(), layer), topology, 3);
         artist.draw("forest", 5, layer);
-        layer = ZoomLayer.NORMAL.apply(random.nextLong(), layer);
+        layer = periodicForestLayer(ZoomLayer.NORMAL.apply(random.nextLong(), layer), topology, 2);
         artist.draw("forest", 6, layer);
-        layer = ForestEdgeLayer.INSTANCE.apply(random.nextLong(), layer);
+        layer = periodicForestLayer(ForestEdgeLayer.INSTANCE.apply(random.nextLong(), layer), topology, 2);
         artist.draw("forest", 7, layer);
-        layer = ForestRandomizeSmallLayer.INSTANCE.apply(random.nextLong(), layer);
+        layer = periodicForestLayer(ForestRandomizeSmallLayer.INSTANCE.apply(random.nextLong(), layer), topology, 2);
         artist.draw("forest", 8, layer);
 
         for (int i = 0; i < 2; i++)
         {
-            layer = ZoomLayer.NORMAL.apply(random.nextLong(), layer);
+            layer = periodicForestLayer(ZoomLayer.NORMAL.apply(random.nextLong(), layer), topology, 1 - i);
             artist.draw("forest", 9 + i, layer);
         }
 
         return layer;
+    }
+
+    private static AreaFactory periodicForestLayer(AreaFactory factory, WorldTopology topology, int remainingZooms)
+    {
+        if (!topology.wraps()) return factory;
+
+        final int scale = 1 << remainingZooms;
+        final int minX = Math.floorDiv(topology.minChunkX(), scale);
+        final int minZ = Math.floorDiv(topology.minChunkZ(), scale);
+        final int width = Math.max(1, topology.widthChunks() / scale);
+        final int height = Math.max(1, topology.heightChunks() / scale);
+        return () -> {
+            final Area source = factory.get();
+            return new Area((x, z) -> source.get(
+                minX + Math.floorMod(x - minX, width),
+                minZ + Math.floorMod(z - minZ, height)), 1024);
+        };
     }
 
     public static AreaFactory createOverworldRockLayer(RegionGenerator generator, long seed)

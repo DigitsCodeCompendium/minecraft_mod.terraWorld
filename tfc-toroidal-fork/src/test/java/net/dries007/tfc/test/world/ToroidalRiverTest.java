@@ -7,8 +7,10 @@
 package net.dries007.tfc.test.world;
 
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.Mth;
 import org.junit.jupiter.api.Test;
 
+import net.dries007.tfc.client.overworld.SolarCalculator;
 import net.dries007.tfc.world.region.WorldTopology;
 import net.dries007.tfc.world.river.MidpointFractal;
 
@@ -54,8 +56,27 @@ public class ToroidalRiverTest
         final WorldTopology topology = WorldTopology.toroidal(-504, -256, 1008, 512);
 
         assertEquals(504, topology.climateScaleBlocks(true, 20_000));
-        assertEquals(128, topology.climateScaleBlocks(false, 20_000));
+        assertEquals(256, topology.climateScaleBlocks(false, 20_000));
         assertEquals(0, topology.climateScaleBlocks(false, 0));
+    }
+
+    @Test
+    public void climateRunsFromJoinedNorthPoleToCentralEquator()
+    {
+        final WorldTopology topology = WorldTopology.toroidal(-256, -256, 512, 512);
+        final int scale = topology.climateScaleBlocks(false, 20_000);
+        final int offset = topology.climateZOffsetBlocks(20_000);
+
+        assertEquals(256, scale);
+        assertEquals(128, offset);
+        assertEquals(-scale / 2, -256 + offset); // North pole at joined top/bottom seam
+        assertEquals(scale / 2, offset); // Equator halfway around the torus
+        assertEquals(Mth.HALF_PI, SolarCalculator.getLatitude(-256 + offset, scale, true));
+        assertEquals(Mth.PI / 4f, SolarCalculator.getLatitude(-128 + offset, scale, true));
+        assertEquals(0f, SolarCalculator.getLatitude(offset, scale, true));
+        assertEquals(Mth.PI / 4f, SolarCalculator.getLatitude(128 + offset, scale, true));
+        assertEquals(Mth.HALF_PI, SolarCalculator.getLatitude(256 + offset, scale, true));
+        assertEquals(true, topology.mirrorsSouthernHemisphere());
     }
 
     @Test

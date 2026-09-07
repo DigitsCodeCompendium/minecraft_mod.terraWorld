@@ -55,6 +55,8 @@ public class OverworldClimateModel implements ClimateModel
     public static final StreamCodec<ByteBuf, OverworldClimateModel> STREAM_CODEC = StreamCodec.composite(
         ByteBufCodecs.VAR_LONG, c -> c.climateSeed,
         ByteBufCodecs.FLOAT, c -> c.temperatureScale,
+        ByteBufCodecs.VAR_INT, c -> c.temperatureOffset,
+        ByteBufCodecs.BOOL, c -> c.mirrorSouthernHemisphere,
         OverworldClimateModel::new
     );
 
@@ -93,19 +95,25 @@ public class OverworldClimateModel implements ClimateModel
 
     protected final long climateSeed;
     protected final float temperatureScale;
+    protected final int temperatureOffset;
+    protected final boolean mirrorSouthernHemisphere;
 
     public OverworldClimateModel(ServerLevel level, ChunkGeneratorExtension extension)
     {
         this(
             LinearCongruentialGenerator.next(level.getSeed(), 719283741234L),
-            extension.climateTemperatureScale()
+            extension.climateTemperatureScale(),
+            extension.climateTemperatureOffset(),
+            extension.climateMirrorsSouthernHemisphere()
         );
     }
 
-    protected OverworldClimateModel(long climateSeed, float temperatureScale)
+    protected OverworldClimateModel(long climateSeed, float temperatureScale, int temperatureOffset, boolean mirrorSouthernHemisphere)
     {
         this.climateSeed = climateSeed;
         this.temperatureScale = temperatureScale;
+        this.temperatureOffset = temperatureOffset;
+        this.mirrorSouthernHemisphere = mirrorSouthernHemisphere;
     }
 
     @Override
@@ -118,6 +126,18 @@ public class OverworldClimateModel implements ClimateModel
     public float hemisphereScale()
     {
         return temperatureScale;
+    }
+
+    @Override
+    public int hemisphereOffset()
+    {
+        return temperatureOffset;
+    }
+
+    @Override
+    public boolean mirrorsSouthernHemisphere()
+    {
+        return mirrorSouthernHemisphere;
     }
 
     @Override
@@ -392,7 +412,7 @@ public class OverworldClimateModel implements ClimateModel
      */
     public float getAverageMonthlyTemperature(int z, int y, float averageTemperature, float monthFactor, boolean ignoreHemispheres)
     {
-        if (ignoreHemispheres && !SolarCalculator.getInNorthernHemisphere(z, hemisphereScale()))
+        if (ignoreHemispheres && !SolarCalculator.getInNorthernHemisphere(z + temperatureOffset, hemisphereScale(), mirrorSouthernHemisphere))
         {
             monthFactor = -monthFactor;
         }
@@ -439,7 +459,8 @@ public class OverworldClimateModel implements ClimateModel
      */
     protected float calculateMonthlyTemperature(int z, float monthTemperatureModifier)
     {
-        return monthTemperatureModifier * (temperatureScale == 0 ? 0 : Helpers.triangle(-18f, 0f, 1f / (4f * temperatureScale), z - temperatureScale / 2));
+        final float latitudeFactor = temperatureScale == 0 ? 0 : Helpers.triangle(-18f, 0f, 1f / (4f * temperatureScale), z + temperatureOffset - temperatureScale / 2);
+        return monthTemperatureModifier * (mirrorSouthernHemisphere ? Math.abs(latitudeFactor) : latitudeFactor);
     }
 
     /**
@@ -450,7 +471,7 @@ public class OverworldClimateModel implements ClimateModel
     protected float calculateDailyTemperature(long calendarTime, long daysInMonth, int z)
     {
         // Hottest part of the day at noon, coldest at midnight, range [-1, 1]
-        final int sunBasedDayTime = SolarCalculator.getSunBasedDayTime(z, hemisphereScale(), ICalendar.getFractionOfYear(calendarTime, daysInMonth), ICalendar.getFractionOfDay(calendarTime));
+        final int sunBasedDayTime = SolarCalculator.getSunBasedDayTime(z + temperatureOffset, hemisphereScale(), ICalendar.getFractionOfYear(calendarTime, daysInMonth), ICalendar.getFractionOfDay(calendarTime), mirrorSouthernHemisphere);
         // This is always by 24,000 ticks because the getSunBasedDayTime is scaled to vanilla day lengths
         final float fractionOfDay = (float) sunBasedDayTime / 24_000;
         final float hourModifier = fractionOfDay < 0.5f

@@ -65,6 +65,18 @@ public interface ClimateModel
         return 20_000;
     }
 
+    /** Offset applied to Z before hemisphere and celestial calculations. */
+    default int hemisphereOffset()
+    {
+        return 0;
+    }
+
+    /** Whether negative latitudes are reflected into the northern hemisphere. */
+    default boolean mirrorsSouthernHemisphere()
+    {
+        return false;
+    }
+
     /**
      * Get the base average annual temperature for a given XYZ position.
      *

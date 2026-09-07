@@ -46,5 +46,12 @@ versionRange="[1.0.0,)"
 ordering="AFTER"
 side="BOTH"
 
+[[dependencies.tfc_toroidal_compat]]
+modId="journeymap"
+type="optional"
+versionRange="[1.21.1-6.0.0,)"
+ordering="AFTER"
+side="BOTH"
+
 [[mixins]]
 config="tfc_toroidal_compat.mixins.json"

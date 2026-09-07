@@ -171,7 +171,7 @@ public final class TFCColors
 
         // See Desmos: https://www.desmos.com/calculator/jw5zkjxtnz
         final float x;
-        final boolean inNorthernHemisphere = SolarCalculator.getInNorthernHemisphere(pos.getZ(), ClimateRenderCache.INSTANCE.getHemisphereScale());
+        final boolean inNorthernHemisphere = SolarCalculator.getInNorthernHemisphere(pos.getZ() + ClimateRenderCache.INSTANCE.getHemisphereOffset(), ClimateRenderCache.INSTANCE.getHemisphereScale(), ClimateRenderCache.INSTANCE.mirrorsSouthernHemisphere());
         float seasonOffset = 0;
         if (temp <= 12f)
         {

@@ -51,6 +51,18 @@ public interface ChunkGeneratorExtension
         return settings().temperatureScale();
     }
 
+    /** Offset applied to Z before calculating latitude and temperature bands. */
+    default int climateTemperatureOffset()
+    {
+        return 0;
+    }
+
+    /** Whether the southern half of the latitude cycle mirrors the north. */
+    default boolean climateMirrorsSouthernHemisphere()
+    {
+        return false;
+    }
+
     /**
      * @return The rock layer settings.
      */

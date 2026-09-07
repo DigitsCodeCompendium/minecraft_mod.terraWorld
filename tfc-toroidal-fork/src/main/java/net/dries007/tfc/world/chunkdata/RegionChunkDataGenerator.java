@@ -81,7 +81,7 @@ public final class RegionChunkDataGenerator implements ChunkDataGenerator
         this.layerSkewXNoise = new OpenSimplex2D(seed.next()).octaves(2).scaled(-1.8f, 1.8f).spread(0.01f);
         this.layerSkewZNoise = new OpenSimplex2D(seed.next()).octaves(2).scaled(-1.8f, 1.8f).spread(0.01f);
 
-        this.forestTypeLayer = new ConcurrentArea<>(TFCLayers.createOverworldForestLayer(seed.next(), IArtist.nope()), ForestType::valueOf);
+        this.forestTypeLayer = new ConcurrentArea<>(TFCLayers.createOverworldForestLayer(seed.next(), IArtist.nope(), regionGenerator.topology), ForestType::valueOf);
     }
 
     @Override
@@ -194,10 +194,10 @@ public final class RegionChunkDataGenerator implements ChunkDataGenerator
         return regionGenerator.topology.samplePeriodicGrid(x, z, (sampleX, sampleZ) -> {
             final int x0 = Mth.floor(sampleX), z0 = Mth.floor(sampleZ);
             final double dx = sampleX - x0, dz = sampleZ - z0;
-            final double v00 = value.applyAsDouble(regionGenerator.getOrCreateRegionPointUnwrapped(x0, z0));
-            final double v01 = value.applyAsDouble(regionGenerator.getOrCreateRegionPointUnwrapped(x0, z0 + 1));
-            final double v10 = value.applyAsDouble(regionGenerator.getOrCreateRegionPointUnwrapped(x0 + 1, z0));
-            final double v11 = value.applyAsDouble(regionGenerator.getOrCreateRegionPointUnwrapped(x0 + 1, z0 + 1));
+            final double v00 = value.applyAsDouble(regionGenerator.getOrCreateRegionPoint(x0, z0));
+            final double v01 = value.applyAsDouble(regionGenerator.getOrCreateRegionPoint(x0, z0 + 1));
+            final double v10 = value.applyAsDouble(regionGenerator.getOrCreateRegionPoint(x0 + 1, z0));
+            final double v11 = value.applyAsDouble(regionGenerator.getOrCreateRegionPoint(x0 + 1, z0 + 1));
             return Mth.lerp(dz, Mth.lerp(dx, v00, v10), Mth.lerp(dx, v01, v11));
         });
     }

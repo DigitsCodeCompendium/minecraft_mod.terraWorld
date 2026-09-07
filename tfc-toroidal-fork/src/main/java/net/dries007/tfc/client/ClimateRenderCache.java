@@ -42,6 +42,8 @@ public enum ClimateRenderCache
     }
 
     private float hemisphereScale;
+    private int hemisphereOffset;
+    private boolean mirrorSouthernHemisphere;
     private float averageSeaLevelTemperature;
     private float averageTemperature;
     private float temperature;
@@ -88,6 +90,8 @@ public enum ClimateRenderCache
             groundwater = model.getInstantGroundwater(level, pos);
             wind = model.getWind(level, pos);
             hemisphereScale = model.hemisphereScale();
+            hemisphereOffset = model.hemisphereOffset();
+            mirrorSouthernHemisphere = model.mirrorsSouthernHemisphere();
 
             // Calculate a real rain level to interpolate from on client. This reads the level's rain level, which includes influence
             // from climate, but doesn't include local influences.
@@ -163,6 +167,16 @@ public enum ClimateRenderCache
     public float getHemisphereScale()
     {
         return hemisphereScale;
+    }
+
+    public int getHemisphereOffset()
+    {
+        return hemisphereOffset;
+    }
+
+    public boolean mirrorsSouthernHemisphere()
+    {
+        return mirrorSouthernHemisphere;
     }
 
     public Vec2 getWind()
