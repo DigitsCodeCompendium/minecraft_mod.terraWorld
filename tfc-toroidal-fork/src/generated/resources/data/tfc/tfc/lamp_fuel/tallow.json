@@ -1,7 +1,0 @@
-{
-  "burn_rate": 2400,
-  "fluid": {
-    "fluid": "tfc:tallow"
-  },
-  "lamps": "#tfc:lamps"
-}

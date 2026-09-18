@@ -1,8 +1,0 @@
-{
-  "decay_modifier": 3.0,
-  "hunger": 4,
-  "ingredient": {
-    "item": "tfc:food/peafowl"
-  },
-  "protein": 1.5
-}

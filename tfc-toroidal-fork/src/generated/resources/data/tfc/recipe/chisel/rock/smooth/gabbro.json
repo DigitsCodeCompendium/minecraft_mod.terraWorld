@@ -1,9 +1,0 @@
-{
-  "type": "tfc:chisel",
-  "ingredient": [
-    "tfc:rock/raw/gabbro",
-    "tfc:rock/hardened/gabbro"
-  ],
-  "mode": "tfc:smooth",
-  "result": "tfc:rock/smooth/gabbro"
-}

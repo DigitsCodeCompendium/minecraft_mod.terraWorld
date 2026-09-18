@@ -1,7 +1,0 @@
-{
-  "type": "tfc:collapse",
-  "ingredient": [
-    "tfc:ore/rich_magnetite/dolomite"
-  ],
-  "result": "tfc:ore/normal_magnetite/dolomite"
-}

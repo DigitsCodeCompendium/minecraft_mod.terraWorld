@@ -1,7 +1,0 @@
-{
-  "type": "tfc:collapse",
-  "ingredient": [
-    "tfc:ore/normal_hematite/tuff"
-  ],
-  "result": "tfc:ore/poor_hematite/tuff"
-}

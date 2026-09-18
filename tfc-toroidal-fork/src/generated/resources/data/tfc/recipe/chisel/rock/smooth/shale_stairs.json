@@ -1,8 +1,0 @@
-{
-  "type": "tfc:chisel",
-  "ingredient": [
-    "tfc:rock/smooth/shale"
-  ],
-  "mode": "tfc:stair",
-  "result": "tfc:rock/smooth/shale_stairs"
-}

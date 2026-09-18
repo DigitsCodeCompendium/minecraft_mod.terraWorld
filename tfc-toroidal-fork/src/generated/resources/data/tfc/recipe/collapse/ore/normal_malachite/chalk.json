@@ -1,7 +1,0 @@
-{
-  "type": "tfc:collapse",
-  "ingredient": [
-    "tfc:ore/rich_malachite/chalk"
-  ],
-  "result": "tfc:ore/normal_malachite/chalk"
-}

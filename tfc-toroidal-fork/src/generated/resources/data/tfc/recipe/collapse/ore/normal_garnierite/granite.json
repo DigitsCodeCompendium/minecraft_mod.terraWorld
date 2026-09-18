@@ -1,7 +1,0 @@
-{
-  "type": "tfc:collapse",
-  "ingredient": [
-    "tfc:ore/rich_garnierite/granite"
-  ],
-  "result": "tfc:ore/normal_garnierite/granite"
-}

@@ -1,7 +1,0 @@
-{
-  "type": "tfc:collapse",
-  "ingredient": [
-    "tfc:ore/rich_sphalerite/dacite"
-  ],
-  "result": "tfc:ore/normal_sphalerite/dacite"
-}

@@ -1,7 +1,0 @@
-{
-  "decay_modifier": 4.5,
-  "hunger": 4,
-  "ingredient": {
-    "item": "tfc:food/rice_bread_jam_sandwich"
-  }
-}

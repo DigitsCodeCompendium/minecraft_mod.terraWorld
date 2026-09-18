@@ -1,0 +1,39 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.terraskills.toroidalcompat.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AddHotspotsMixin",
+    "BiomeNoiseSamplerMixin",
+    "ChunkHeightFillerAccessor",
+    "ChunkHeightFillerMixin",
+    "ChunkNoiseFillerMixin",
+    "ChunkDataMixin",
+    "ForestInitLayerAccessor",
+    "IceSheetShieldVolcanoSurfaceBuilderMixin",
+    "IceSheetSurfaceBuilderMixin",
+    "MutableDensityFunctionContextMixin",
+    "MidpointFractalMixin",
+    "OverworldClimateModelMixin",
+    "RegionAccessor",
+    "RegionBiomeSourceMixin",
+    "RegionChunkDataGeneratorMixin",
+    "RegionGeneratorMixin",
+    "RiverEdgeMixin",
+    "ShapedDimensionsMixin",
+    "ShoreAndOceanSurfaceBuilderMixin",
+    "ShoreSurfaceStateMixin",
+    "SolarCalculatorMixin",
+    "TFCChunkGeneratorAccessor",
+    "TFCChunkGeneratorMixin",
+    "TFCLayersMixin"
+  ],
+  "client": [
+    "ChunkWatchPacketMixin",
+    "TFCColorsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

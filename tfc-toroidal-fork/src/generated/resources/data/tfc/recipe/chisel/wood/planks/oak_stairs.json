@@ -1,8 +1,0 @@
-{
-  "type": "tfc:chisel",
-  "ingredient": [
-    "tfc:wood/planks/oak"
-  ],
-  "mode": "tfc:stair",
-  "result": "tfc:wood/planks/oak_stairs"
-}

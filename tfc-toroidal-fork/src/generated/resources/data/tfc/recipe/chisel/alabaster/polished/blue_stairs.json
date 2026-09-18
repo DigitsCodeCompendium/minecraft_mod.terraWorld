@@ -1,8 +1,0 @@
-{
-  "type": "tfc:chisel",
-  "ingredient": [
-    "tfc:alabaster/polished/blue"
-  ],
-  "mode": "tfc:stair",
-  "result": "tfc:alabaster/polished/blue_stairs"
-}

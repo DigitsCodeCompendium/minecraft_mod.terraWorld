@@ -1,8 +1,0 @@
-{
-  "type": "tfc:chisel",
-  "ingredient": [
-    "tfc:rock/smooth/claystone"
-  ],
-  "mode": "tfc:stair",
-  "result": "tfc:rock/smooth/claystone_stairs"
-}

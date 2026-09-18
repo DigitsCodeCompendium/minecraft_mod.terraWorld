@@ -1,7 +1,0 @@
-{
-  "type": "tfc:collapse",
-  "ingredient": [
-    "tfc:ore/rich_hematite/diorite"
-  ],
-  "result": "tfc:ore/normal_hematite/diorite"
-}

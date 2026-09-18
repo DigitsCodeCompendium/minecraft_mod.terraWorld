@@ -1,8 +1,0 @@
-{
-  "type": "tfc:chisel",
-  "ingredient": [
-    "tfc:raw_sandstone/green"
-  ],
-  "mode": "tfc:smooth",
-  "result": "tfc:smooth_sandstone/green"
-}

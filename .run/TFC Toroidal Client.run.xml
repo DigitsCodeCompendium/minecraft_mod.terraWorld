@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":tfc-toroidal-compat:runClient" />
+          <option value="runClient" />
         </list>
       </option>
       <option name="vmOptions" value="" />

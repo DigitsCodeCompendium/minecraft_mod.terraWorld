@@ -1,8 +1,0 @@
-{
-  "type": "tfc:chisel",
-  "ingredient": [
-    "tfc:rock/bricks/andesite"
-  ],
-  "mode": "tfc:smooth",
-  "result": "tfc:rock/chiseled/andesite"
-}

@@ -1,8 +1,0 @@
-{
-  "type": "tfc:chisel",
-  "ingredient": [
-    "tfc:rock/bricks/granite"
-  ],
-  "mode": "tfc:smooth",
-  "result": "tfc:rock/chiseled/granite"
-}

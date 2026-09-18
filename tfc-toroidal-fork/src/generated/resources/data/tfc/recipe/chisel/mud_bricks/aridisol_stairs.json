@@ -1,8 +1,0 @@
-{
-  "type": "tfc:chisel",
-  "ingredient": [
-    "tfc:mud_bricks/aridisol"
-  ],
-  "mode": "tfc:stair",
-  "result": "tfc:mud_bricks/aridisol_stairs"
-}

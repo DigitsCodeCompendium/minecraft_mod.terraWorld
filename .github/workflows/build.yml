@@ -27,10 +27,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Make Gradle wrappers executable
-        run: chmod +x gradlew tfc-toroidal-fork/gradlew
-
-      - name: Build TFC fork
-        run: ./tfc-toroidal-fork/gradlew -p tfc-toroidal-fork clean test jar
+        run: chmod +x gradlew
 
       - name: Build and verify compatibility mod
         shell: bash
@@ -45,8 +42,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p release
-          cp tfc-toroidal-fork/build/libs/TerraFirmaCraft-NeoForge-*.jar release/
-          cp tfc-toroidal-compat/build/libs/tfc-toroidal-compat-*.jar release/
+          cp build/libs/tfc_toroidal_compat-*.jar release/
           cd release
           sha256sum *.jar > SHA256SUMS
 

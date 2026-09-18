@@ -1,7 +1,0 @@
-{
-  "type": "tfc:collapse",
-  "ingredient": [
-    "tfc:ore/normal_cassiterite/claystone"
-  ],
-  "result": "tfc:ore/poor_cassiterite/claystone"
-}

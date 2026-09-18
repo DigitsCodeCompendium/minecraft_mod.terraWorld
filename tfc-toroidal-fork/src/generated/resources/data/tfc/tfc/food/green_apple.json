@@ -1,9 +1,0 @@
-{
-  "decay_modifier": 2.5,
-  "fruit": 0.9,
-  "hunger": 4,
-  "ingredient": {
-    "item": "tfc:food/green_apple"
-  },
-  "saturation": 0.6
-}

@@ -1,9 +1,0 @@
-{
-  "decay_modifier": 0.25,
-  "grain": 1.0,
-  "hunger": 4,
-  "ingredient": {
-    "item": "tfc:food/maize_grain"
-  },
-  "saturation": 0.5
-}

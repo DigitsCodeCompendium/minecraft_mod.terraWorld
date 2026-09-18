@@ -1,14 +1,16 @@
 # terraWorld
 
-`terraWorld` provides TerraFirmaCraft 4.2.9 compatibility for Toroidal World on
+`terraWorld` provides TerraFirmaCraft 4.2.10 compatibility for Toroidal World on
 Minecraft 1.21.1 / NeoForge. It keeps TFC terrain, biomes, climate, rainfall,
 groundwater, grass colors, caves, rivers, and client climate data continuous
 across wrapped world boundaries.
 
-## Modules
+## Project layout
 
-- `tfc-toroidal-fork`: the topology-aware TerraFirmaCraft fork.
-- `tfc-toroidal-compat`: the Toroidal World integration and client HUD.
+The repository root is the `tfc_toroidal_compat` mod, built with the official
+NeoForge 1.21.1 ModDevGradle MDK layout. It compiles and runs against the public
+TerraFirmaCraft 4.2.10 release; no patched TFC fork is required. Toroidal behavior
+is implemented in this addon through Mixins and addon-owned topology helpers.
 
 ## JourneyMap compatibility
 
@@ -35,18 +37,16 @@ equator, +180 at the upper pole edge, and -180 at the lower pole edge. The two
 
 ## Development
 
-Use Java 21. Build the fork first, followed by the compatibility module:
+Use Java 21 and build the compatibility mod directly:
 
 ```powershell
-cd tfc-toroidal-fork
-.\gradlew.bat jar
-cd ..
-.\gradlew.bat -p tfc-toroidal-compat build writeMinecraftClasspathClient
+.\gradlew.bat build
 ```
 
 Import the repository root into IntelliJ IDEA and use the included
-`TFC Toroidal Client` run configuration. Test world-generation changes in a new
-world because existing chunks are not regenerated.
+`TFC Toroidal Client` run configuration (or the generated `runClient` Gradle
+task). Test world-generation changes in a new world because existing chunks are
+not regenerated.
 
 ## Client HUD
 

@@ -1,8 +1,0 @@
-{
-  "type": "tfc:chisel",
-  "ingredient": [
-    "tfc:rock/raw/gneiss"
-  ],
-  "mode": "tfc:stair",
-  "result": "tfc:rock/raw/gneiss_stairs"
-}

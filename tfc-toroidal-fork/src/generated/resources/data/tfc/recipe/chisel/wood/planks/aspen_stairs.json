@@ -1,8 +1,0 @@
-{
-  "type": "tfc:chisel",
-  "ingredient": [
-    "tfc:wood/planks/aspen"
-  ],
-  "mode": "tfc:stair",
-  "result": "tfc:wood/planks/aspen_stairs"
-}

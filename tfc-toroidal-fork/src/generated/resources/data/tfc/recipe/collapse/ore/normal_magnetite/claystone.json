@@ -1,7 +1,0 @@
-{
-  "type": "tfc:collapse",
-  "ingredient": [
-    "tfc:ore/rich_magnetite/claystone"
-  ],
-  "result": "tfc:ore/normal_magnetite/claystone"
-}

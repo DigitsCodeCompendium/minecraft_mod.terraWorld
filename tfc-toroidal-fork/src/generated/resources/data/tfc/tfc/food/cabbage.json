@@ -1,9 +1,0 @@
-{
-  "decay_modifier": 1.2,
-  "hunger": 4,
-  "ingredient": {
-    "item": "tfc:food/cabbage"
-  },
-  "saturation": 1.0,
-  "vegetables": 2.0
-}

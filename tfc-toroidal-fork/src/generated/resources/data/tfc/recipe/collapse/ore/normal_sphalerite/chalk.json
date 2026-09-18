@@ -1,7 +1,0 @@
-{
-  "type": "tfc:collapse",
-  "ingredient": [
-    "tfc:ore/rich_sphalerite/chalk"
-  ],
-  "result": "tfc:ore/normal_sphalerite/chalk"
-}

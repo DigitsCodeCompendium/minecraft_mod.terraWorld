@@ -1,9 +1,0 @@
-{
-  "decay_modifier": 0.25,
-  "grain": 0.5,
-  "hunger": 4,
-  "ingredient": {
-    "item": "tfc:food/barley_grain"
-  },
-  "saturation": 0.5
-}
